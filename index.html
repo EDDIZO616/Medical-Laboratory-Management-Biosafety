@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medical Laboratory Management & Biosafety — Advanced Course Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0A0F1E;
+    --ink-light: #1E2A42;
+    --lab-teal: #0D9488;
+    --lab-teal-glow: #14B8A6;
+    --bio-amber: #F59E0B;
+    --danger-red: #EF4444;
+    --safe-green: #10B981;
+    --slate: #334155;
+    --slate-mid: #475569;
+    --surface-0: #070D1B;
+    --surface-1: #0E1829;
+    --surface-2: #162035;
+    --surface-3: #1E2D47;
+    --border: rgba(13,148,136,0.2);
+    --border-bright: rgba(13,148,136,0.5);
+    --text-primary: #E2E8F0;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-body: 'Space Grotesk', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--surface-0);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── ANIMATED BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 10% 20%, rgba(13,148,136,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 90% 80%, rgba(245,158,11,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 50% 50%, rgba(14,184,166,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── GRID OVERLAY ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(13,148,136,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13,148,136,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── SIDEBAR NAV ── */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(14,24,41,0.97);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(12px);
+    scrollbar-width: thin;
+    scrollbar-color: var(--lab-teal) transparent;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--lab-teal); border-radius: 2px; }
+
+  .sidebar-header {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(14,24,41,0.98);
+    z-index: 10;
+  }
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--lab-teal), var(--bio-amber));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .logo-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--lab-teal-glow);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.3;
+  }
+  .sidebar-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+  }
+
+  .sidebar-search {
+    margin: 0 24px 16px;
+  }
+  .sidebar-search input {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .sidebar-search input:focus { border-color: var(--lab-teal); }
+  .sidebar-search input::placeholder { color: var(--text-muted); }
+
+  .sidebar-nav { padding: 8px 0 24px; }
+  .nav-group-label {
+    padding: 12px 24px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 24px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.4;
+    transition: all 0.18s;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+  }
+  .nav-item:hover {
+    color: var(--text-primary);
+    background: rgba(13,148,136,0.08);
+    border-left-color: var(--lab-teal);
+  }
+  .nav-item.active {
+    color: var(--lab-teal-glow);
+    background: rgba(13,148,136,0.12);
+    border-left-color: var(--lab-teal-glow);
+    font-weight: 500;
+  }
+  .nav-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    padding-top: 2px;
+    flex-shrink: 0;
+    min-width: 20px;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main-wrap {
+    margin-left: 280px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 80px 64px 64px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(13,148,136,0.06) 0%, transparent 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '⚗';
+    position: absolute;
+    right: 80px;
+    top: 40px;
+    font-size: 180px;
+    opacity: 0.03;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(13,148,136,0.12);
+    border: 1px solid var(--border-bright);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--lab-teal-glow);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-eyebrow::before { content: '●'; font-size: 8px; animation: pulse-dot 2s infinite; }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 4vw, 56px);
+    line-height: 1.15;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    max-width: 700px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--lab-teal-glow);
+  }
+  .hero-desc {
+    font-size: 17px;
+    color: var(--text-secondary);
+    max-width: 580px;
+    margin-bottom: 40px;
+    line-height: 1.7;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 32px;
+    color: var(--lab-teal-glow);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── CONTENT SECTIONS ── */
+  .content-area {
+    max-width: 900px;
+    padding: 0 64px 80px;
+  }
+
+  .part-section {
+    padding: 64px 0 0;
+    border-top: 1px solid var(--border);
+    scroll-margin-top: 24px;
+  }
+  .part-section:first-child { border-top: none; }
+
+  .part-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .part-badge {
+    flex-shrink: 0;
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, rgba(13,148,136,0.2), rgba(13,148,136,0.05));
+    border: 1px solid var(--border-bright);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--lab-teal-glow);
+    line-height: 1;
+  }
+  .part-title-group {}
+  .part-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .part-title {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.5vw, 30px);
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  /* Sub-sections */
+  .sub-section {
+    margin-top: 40px;
+  }
+  .sub-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sub-title::before {
+    content: '';
+    display: inline-block;
+    width: 3px; height: 18px;
+    background: var(--lab-teal);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    font-size: 15.5px;
+    line-height: 1.8;
+  }
+  p strong, strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* ── TABLES ── */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 24px 0;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  thead tr {
+    background: rgba(13,148,136,0.12);
+    border-bottom: 1px solid var(--border-bright);
+  }
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--lab-teal-glow);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  td {
+    padding: 12px 16px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+  tbody tr:hover td { background: rgba(13,148,136,0.05); }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-left: 3px solid;
+    font-size: 14.5px;
+    line-height: 1.75;
+  }
+  .callout.info {
+    background: rgba(13,148,136,0.08);
+    border-color: var(--lab-teal);
+    color: var(--text-secondary);
+  }
+  .callout.warning {
+    background: rgba(245,158,11,0.08);
+    border-color: var(--bio-amber);
+    color: var(--text-secondary);
+  }
+  .callout.danger {
+    background: rgba(239,68,68,0.08);
+    border-color: var(--danger-red);
+    color: var(--text-secondary);
+  }
+  .callout.success {
+    background: rgba(16,185,129,0.08);
+    border-color: var(--safe-green);
+    color: var(--text-secondary);
+  }
+  .callout-title {
+    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .callout.info .callout-title { color: var(--lab-teal-glow); }
+  .callout.warning .callout-title { color: var(--bio-amber); }
+  .callout.danger .callout-title { color: var(--danger-red); }
+  .callout.success .callout-title { color: var(--safe-green); }
+
+  /* ── LISTS ── */
+  ul.content-list, ol.content-list {
+    margin: 16px 0 16px 0;
+    padding: 0;
+    list-style: none;
+  }
+  ul.content-list li {
+    position: relative;
+    padding: 6px 0 6px 24px;
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  ul.content-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--lab-teal);
+    font-size: 13px;
+    top: 8px;
+  }
+  ol.content-list { counter-reset: item; }
+  ol.content-list li {
+    position: relative;
+    padding: 8px 0 8px 36px;
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    counter-increment: item;
+  }
+  ol.content-list li::before {
+    content: counter(item);
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 24px;
+    height: 24px;
+    background: rgba(13,148,136,0.15);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--lab-teal-glow);
+    font-weight: 600;
+  }
+
+  /* ── CODE / FORMULA BLOCKS ── */
+  .formula-block {
+    background: var(--surface-2);
+    border: 1px solid var(--border-bright);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--lab-teal-glow);
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+  .formula-block .formula-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* ── STEP PROCESS ── */
+  .steps-wrap {
+    margin: 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .step-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px 0;
+    position: relative;
+  }
+  .step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 17px;
+    top: 48px;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 36px; height: 36px;
+    background: var(--surface-2);
+    border: 2px solid var(--lab-teal);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--lab-teal-glow);
+    z-index: 1;
+    position: relative;
+  }
+  .step-content {}
+  .step-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  .step-desc {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── LEVEL CARDS ── */
+  .level-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .level-card {
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface-1);
+    transition: all 0.2s;
+  }
+  .level-card:hover {
+    border-color: var(--border-bright);
+    background: var(--surface-2);
+    transform: translateY(-2px);
+  }
+  .level-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .bsl1 .level-label { background: rgba(16,185,129,0.15); color: var(--safe-green); }
+  .bsl2 .level-label { background: rgba(245,158,11,0.15); color: var(--bio-amber); }
+  .bsl3 .level-label { background: rgba(239,68,68,0.15); color: #f87171; }
+  .bsl4 .level-label { background: rgba(139,92,246,0.15); color: #a78bfa; }
+  .level-card h4 { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+  .level-card p { font-size: 12.5px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+
+  /* ── HIERARCHY VISUAL ── */
+  .hierarchy-list {
+    margin: 20px 0;
+  }
+  .hierarchy-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    margin-bottom: 4px;
+    border-radius: 8px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    transition: border-color 0.2s;
+  }
+  .hierarchy-item:hover { border-color: var(--border-bright); }
+  .hierarchy-rank {
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .hierarchy-bar {
+    flex-shrink: 0;
+    width: 6px;
+    height: 32px;
+    border-radius: 3px;
+  }
+  .hb-1 { background: var(--safe-green); }
+  .hb-2 { background: #22d3ee; }
+  .hb-3 { background: var(--bio-amber); }
+  .hb-4 { background: #f97316; }
+  .hb-5 { background: var(--danger-red); }
+  .hierarchy-text {}
+  .hierarchy-name { font-weight: 600; font-size: 14px; color: var(--text-primary); }
+  .hierarchy-desc { font-size: 13px; color: var(--text-secondary); }
+  .hierarchy-eff {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  /* ── SIGMA METRIC VISUAL ── */
+  .sigma-bar-wrap {
+    margin: 20px 0;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .sigma-bar-track {
+    height: 24px;
+    background: var(--surface-2);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    display: flex;
+  }
+  .sigma-seg {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+  }
+  .sigma-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  /* ── QUICK REF CARDS ── */
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .ref-card {
+    padding: 20px;
+    border-radius: 10px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .ref-card:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .ref-card-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .ref-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  .ref-card-body {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ── EXAM CHECKLIST ── */
+  .checklist {
+    margin: 20px 0;
+  }
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .check-box {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    border: 2px solid var(--lab-teal);
+    border-radius: 4px;
+    margin-top: 2px;
+  }
+  .check-text {
+    font-size: 14.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    margin-left: 280px;
+    padding: 32px 64px;
+    border-top: 1px solid var(--border);
+    background: rgba(14,24,41,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: gap;
+    font-size: 13px;
+    color: var(--text-muted);
+    position: relative;
+    z-index: 1;
+  }
+  .footer-note {
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .footer-badge {
+    padding: 6px 14px;
+    background: rgba(13,148,136,0.1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--lab-teal-glow);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  /* ── MOBILE TOGGLE ── */
+  .mobile-toggle {
+    display: none;
+    position: fixed;
+    top: 16px; left: 16px;
+    z-index: 200;
+    background: var(--surface-2);
+    border: 1px solid var(--border-bright);
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    color: var(--lab-teal-glow);
+    font-size: 18px;
+  }
+
+  /* ── BACK TO TOP ── */
+  .back-top {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    z-index: 100;
+    width: 44px; height: 44px;
+    background: var(--lab-teal);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    transform: translateY(10px);
+    text-decoration: none;
+    box-shadow: 0 4px 20px rgba(13,148,136,0.4);
+  }
+  .back-top.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .sidebar.open { transform: translateX(0); }
+    .main-wrap, .site-footer { margin-left: 0; }
+    .content-area { padding: 0 24px 60px; }
+    .hero { padding: 70px 24px 48px; }
+    .mobile-toggle { display: flex; }
+    .back-top { right: 16px; bottom: 16px; }
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .sidebar, .mobile-toggle, .back-top { display: none; }
+    .main-wrap, .site-footer { margin-left: 0; }
+    body { background: white; color: black; }
+    .part-section { page-break-before: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Mobile toggle -->
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle navigation">☰</button>
+
+<!-- Back to top -->
+<a href="#top" class="back-top" id="backTop">↑</a>
+
+<!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🧬</div>
+      <div class="logo-text">MLS Course Notes<br>Biosafety & Management</div>
+    </div>
+    <div class="sidebar-subtitle">BSc Medical Laboratory Science</div>
+  </div>
+
+  <div class="sidebar-search">
+    <input type="text" id="navSearch" placeholder="Search topics…" oninput="filterNav(this.value)">
+  </div>
+
+  <nav class="sidebar-nav" id="sidebarNav">
+    <div class="nav-group-label">Foundation</div>
+    <a class="nav-item" href="#part1"><span class="nav-num">01</span>Lab Management Paradigm</a>
+    <a class="nav-item" href="#part2"><span class="nav-num">02</span>Biosafety Fundamentals</a>
+
+    <div class="nav-group-label">Biosafety Science</div>
+    <a class="nav-item" href="#part3"><span class="nav-num">03</span>Biorisk Assessment (AMP)</a>
+    <a class="nav-item" href="#part4"><span class="nav-num">04</span>Containment & Facility Design</a>
+    <a class="nav-item" href="#part5"><span class="nav-num">05</span>Safe Laboratory Procedures</a>
+    <a class="nav-item" href="#part6"><span class="nav-num">06</span>Decontamination & Sterilization</a>
+
+    <div class="nav-group-label">Operations</div>
+    <a class="nav-item" href="#part7"><span class="nav-num">07</span>Chemical Safety & CHP</a>
+    <a class="nav-item" href="#part8"><span class="nav-num">08</span>Resource Management</a>
+    <a class="nav-item" href="#part9"><span class="nav-num">09</span>Total Testing Cycle</a>
+
+    <div class="nav-group-label">Quality & People</div>
+    <a class="nav-item" href="#part10"><span class="nav-num">10</span>Quality Management (QMS)</a>
+    <a class="nav-item" href="#part11"><span class="nav-num">11</span>Personnel Management</a>
+    <a class="nav-item" href="#part12"><span class="nav-num">12</span>Policy & Documentation</a>
+
+    <div class="nav-group-label">Safety & Emergency</div>
+    <a class="nav-item" href="#part13"><span class="nav-num">13</span>Transport of Infectious Substances</a>
+    <a class="nav-item" href="#part14"><span class="nav-num">14</span>Emergency Preparedness & OHS</a>
+    <a class="nav-item" href="#part15"><span class="nav-num">15</span>Incident Management</a>
+
+    <div class="nav-group-label">Revision</div>
+    <a class="nav-item" href="#checklist"><span class="nav-num">✓</span>Exam Readiness Checklist</a>
+    <a class="nav-item" href="#refs"><span class="nav-num">📖</span>Key References</a>
+  </nav>
+</aside>
+
+<!-- ═══════════════════════════════ MAIN ═══════════════════════════════ -->
+<main class="main-wrap" id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Advanced Course Notes — University Level</div>
+    <h1 class="hero-title">Medical Laboratory<br><em>Management &amp; Biosafety</em></h1>
+    <p class="hero-desc">Advanced lecture notes for BSc Medical Laboratory Science students at Kenyan universities (Maseno, MMUST, and affiliates). Designed for examinations and workplace application.</p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">15</span>
+        <span class="stat-label">Core Parts</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">ISO<br>15189</span>
+        <span class="stat-label">Standard Aligned</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">🇰🇪</span>
+        <span class="stat-label">Kenya Context</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════ CONTENT AREA ════════════════════ -->
+  <div class="content-area">
+
+    <!-- ══ PART 1 ══ -->
+    <section class="part-section" id="part1">
+      <div class="part-header">
+        <div class="part-badge">01</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part One</div>
+          <h2 class="part-title">The Paradigm Shift — From Technician to Diagnostic Leader</h2>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">1.1 The Evolving Role of the Laboratory</h3>
+        <p>In modern Kenyan healthcare (post-Devolution), the laboratory is no longer a passive support unit — it is the <strong>central nervous system of clinical decision-making</strong>. Over <strong>70% of clinical diagnoses</strong> rely on laboratory results. This means that as a laboratory professional, your work directly determines patient outcomes at scale.</p>
+        <p>Your role extends far beyond running tests:</p>
+        <ul class="content-list">
+          <li><strong>Laboratory Stewardship:</strong> Ensuring appropriate test utilization — preventing unnecessary costs and erroneous diagnoses caused by reflexive over-ordering.</li>
+          <li><strong>Total Testing Process (TTP) Management:</strong> You are legally and ethically responsible for errors in the pre-analytical phase (patient misidentification), analytical phase (instrument errors), and post-analytical phase (critical value reporting failures).</li>
+          <li><strong>Strategic Resource Allocation:</strong> Determining which equipment, reagents, and staffing mix optimizes patient care within budget.</li>
+          <li><strong>Regulatory Stewardship:</strong> Ensuring the lab meets national licensing, accreditation, and environmental compliance standards.</li>
+        </ul>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">1.2 The Kenyan Healthcare Laboratory Hierarchy</h3>
+        <p>Medical laboratories in Kenya are classified according to the level of healthcare facility they serve. Graduates aiming for Class B and above must understand the full regulatory landscape.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Class</th><th>Facility Level</th><th>Services Provided</th><th>Examples (Kenya)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>A</strong></td><td>National Referral</td><td>Comprehensive specialized testing, research-level capacity</td><td>KENYATTA National Hospital, Moi Teaching & Referral</td></tr>
+              <tr><td><strong>B</strong></td><td>County/Regional Hospital</td><td>Advanced diagnostics: microbiology, histopathology, special chemistry</td><td>Maseno University Teaching Hospital</td></tr>
+              <tr><td><strong>C</strong></td><td>Sub-county/District Hospital</td><td>Routine diagnostics: haematology, biochemistry, urinalysis, microscopy</td><td>District Hospitals</td></tr>
+              <tr><td><strong>D</strong></td><td>Health Centres</td><td>Basic laboratory services</td><td>Community Health Centres</td></tr>
+              <tr><td><strong>E</strong></td><td>Dispensaries/Clinics</td><td>Point-of-care testing only</td><td>Rural Dispensaries</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">1.3 The Kenyan Regulatory Matrix</h3>
+        <p>To manage a lab legally in Kenya, you must navigate <strong>overlapping regulatory mandates</strong>. Compliance is not optional — unlicensed practice carries criminal penalties under the Medical Laboratory Technicians and Technologists Act.</p>
+        <div class="ref-grid">
+          <div class="ref-card"><span class="ref-card-icon">🏛️</span><div class="ref-card-title">Ministry of Health (MOH)</div><div class="ref-card-body">Issues operational guidelines, biosafety policy, and COVID-era Emergency Use Authorizations for novel diagnostics.</div></div>
+          <div class="ref-card"><span class="ref-card-icon">✅</span><div class="ref-card-title">KENAS</div><div class="ref-card-body">Kenya Accreditation Service — sole ISO 15189:2022 accreditation body. Moving labs from SLIPTA star-grading to full international competence recognition.</div></div>
+          <div class="ref-card"><span class="ref-card-icon">📋</span><div class="ref-card-title">KMLTTB</div><div class="ref-card-body">Kenya Medical Laboratory Technicians & Technologists Board. All laboratory managers must be licensed. Continuing Professional Development (CPD) points are mandatory for licence renewal.</div></div>
+          <div class="ref-card"><span class="ref-card-icon">🌿</span><div class="ref-card-title">NEMA</div><div class="ref-card-body">National Environment Management Authority. Regulates final disposal of hazardous medical and chemical waste. Labs must have an approved Waste Management Plan.</div></div>
+        </div>
+        <div class="callout info">
+          <div class="callout-title">📌 Critical Thinking — ISO 15189 vs. ISO 9001</div>
+          Why is <strong>ISO 15189</strong> preferred over ISO 9001 for medical labs? ISO 15189 specifically addresses the <em>clinical competence of medical staff</em> and the <em>clinical utility of test results</em>, not just general business quality management. A quality lab is not merely efficient — it must produce clinically meaningful data.
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PART 2 ══ -->
+    <section class="part-section" id="part2">
+      <div class="part-header">
+        <div class="part-badge">02</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Two</div>
+          <h2 class="part-title">The Hierarchy of Biosafety Controls</h2>
+        </div>
+      </div>
+
+      <p>Biosafety is <strong>not just about wearing gloves</strong>. It is applied risk engineering — a systematic, layered defense strategy. We apply controls in hierarchical order, from most to least effective.</p>
+
+      <div class="hierarchy-list">
+        <div class="hierarchy-item">
+          <span class="hierarchy-rank">1</span>
+          <div class="hierarchy-bar hb-1"></div>
+          <div class="hierarchy-text"><div class="hierarchy-name">Elimination / Substitution</div><div class="hierarchy-desc">Using non-infectious surrogates or fully automated systems to remove human handling of the hazard entirely.</div></div>
+          <span class="hierarchy-eff">Most Effective</span>
+        </div>
+        <div class="hierarchy-item">
+          <span class="hierarchy-rank">2</span>
+          <div class="hierarchy-bar hb-2"></div>
+          <div class="hierarchy-text"><div class="hierarchy-name">Engineering Controls (Physical Barriers)</div><div class="hierarchy-desc">Biosafety Cabinets (BSCs), sealed centrifuge rotors, negative pressure rooms, HEPA filtration, directional airflow systems.</div></div>
+          <span class="hierarchy-eff">High</span>
+        </div>
+        <div class="hierarchy-item">
+          <span class="hierarchy-rank">3</span>
+          <div class="hierarchy-bar hb-3"></div>
+          <div class="hierarchy-text"><div class="hierarchy-name">Administrative Controls</div><div class="hierarchy-desc">SOPs, restricted access zones, training programs, signage, work practice protocols, vaccination requirements.</div></div>
+          <span class="hierarchy-eff">Moderate</span>
+        </div>
+        <div class="hierarchy-item">
+          <span class="hierarchy-rank">4</span>
+          <div class="hierarchy-bar hb-4"></div>
+          <div class="hierarchy-text"><div class="hierarchy-name">Personal Protective Equipment (PPE)</div><div class="hierarchy-desc">Gowns, gloves, N-95/P100 respirators, face shields. PPE is the <em>last line of defense</em>, not the primary safety strategy.</div></div>
+          <span class="hierarchy-eff">Least Effective</span>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">2.1 Biosafety vs. Biosecurity</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Aspect</th><th>Biosafety</th><th>Biosecurity</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Core Focus</strong></td><td>Protecting people FROM biological agents</td><td>Protecting biological agents FROM people</td></tr>
+              <tr><td><strong>Primary Objective</strong></td><td>Prevent accidental exposure and infection</td><td>Prevent theft, loss, or intentional misuse</td></tr>
+              <tr><td><strong>Key Measures</strong></td><td>PPE, containment, decontamination</td><td>Access control, inventory tracking, personnel screening</td></tr>
+              <tr><td><strong>Scope</strong></td><td>Laboratory practices and procedures</td><td>Security systems and institutional protocols</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">2.2 Biosafety Levels (BSL) — Classification & Kenya Context</h3>
+        <div class="level-grid">
+          <div class="level-card bsl1">
+            <span class="level-label">BSL-1</span>
+            <h4>Basic Laboratory</h4>
+            <p>Non-pathogenic microorganisms. Standard microbiological practices. No special facility requirements. E.g., teaching labs using K-12 E. coli.</p>
+          </div>
+          <div class="level-card bsl2">
+            <span class="level-label">BSL-2</span>
+            <h4>Most Clinical Labs</h4>
+            <p>Moderate risk: Staphylococcus aureus, Salmonella, HIV blood samples. Requires Class II BSC for aerosol-generating procedures. All Kenyan district hospitals.</p>
+          </div>
+          <div class="level-card bsl3">
+            <span class="level-label">BSL-3</span>
+            <h4>Referral / KEMRI Labs</h4>
+            <p>Airborne Mycobacterium tuberculosis cultures. Double-door entry, anterooms, 100% exhaust HEPA. Five operational P3 facilities in Kenya (KEMRI-Wellcome, KEMRI-CDC).</p>
+          </div>
+          <div class="level-card bsl4">
+            <span class="level-label">BSL-4</span>
+            <h4>Maximum Containment</h4>
+            <p>Dangerous/exotic agents — Ebola, Marburg. Positive pressure suits or Class III gas-tight BSC. No operational BSL-4 in Kenya; samples sent regionally.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">2.3 Deep Dive: Biological Safety Cabinets (BSCs)</h3>
+        <p>In Kenyan Class B/C labs, the <strong>Class II Type A2 BSC</strong> is the standard primary containment device.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Class</th><th>Personnel Protection</th><th>Product Protection</th><th>Environment Protection</th><th>Application</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Class I</strong></td><td>✅</td><td>❌</td><td>✅</td><td>Low-moderate risk work, no product protection needed</td></tr>
+              <tr><td><strong>Class II (A2)</strong></td><td>✅</td><td>✅</td><td>✅</td><td>Standard for clinical labs — most common choice in Kenya</td></tr>
+              <tr><td><strong>Class III</strong></td><td>✅ Maximum</td><td>✅</td><td>✅</td><td>Gas-tight, BSL-4 work, glove-box configuration</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout danger">
+          <div class="callout-title">⚠️ Critical Exam Point — Never use open flames in a BSC!</div>
+          A Bunsen burner inside a Class II BSC disrupts the delicate <strong>laminar airflow</strong>, creating turbulent eddies that pull contaminants out of the cabinet and onto the user. Use <strong>electric micro-incinerators</strong> (e.g., Loop-L incinerators) instead. This is a frequently examined safety rule.
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PART 3 ══ -->
+    <section class="part-section" id="part3">
+      <div class="part-header">
+        <div class="part-badge">03</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Three</div>
+          <h2 class="part-title">The Science of Biorisk Assessment — The AMP Model</h2>
+        </div>
+      </div>
+
+      <p>Risk assessment is the <strong>most legally scrutinized document</strong> in your laboratory. A poorly conducted risk assessment that leads to staff infection can result in criminal liability for the laboratory manager. The AMP (Assessment → Mitigation → Performance) Model is the international framework used in Kenya's national Biorisk Management Curriculum.</p>
+
+      <div class="sub-section">
+        <h3 class="sub-title">3.1 The Biorisk Equation</h3>
+        <p>All risk decisions must be quantified using a standardized matrix. Risk is not a feeling — it is a calculated value:</p>
+        <div class="formula-block">
+          <span class="formula-label">The Risk Formula</span>
+          Risk Score = (Probability of Exposure) × (Severity of Consequence)
+          
+          Where:
+          Probability:  1 = Rare  |  2 = Unlikely  |  3 = Possible  |  4 = Likely  |  5 = Almost Certain
+          Severity:     1 = Negligible  |  2 = Minor  |  3 = Moderate  |  4 = Major  |  5 = Catastrophic
+          
+          Risk Level:   Low (1–6)  |  Medium (7–14)  |  High (15–19)  |  Extreme (20–25)
+        </div>
+        <div class="callout info">
+          <div class="callout-title">🧪 Applied Example</div>
+          Needle-stick during phlebotomy on an HIV-positive patient: Probability = 3 (Possible), Severity = 5 (Catastrophic — chronic infection). Risk Score = 15 → <strong>HIGH RISK</strong>. This demands immediate engineering controls (safety-engineered needles) and administrative controls (double-glove policy), not just PPE.
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">3.2 The AMP Model — Three Phases</h3>
+        <div class="steps-wrap">
+          <div class="step-item">
+            <div class="step-num">A</div>
+            <div class="step-content">
+              <div class="step-title">Assessment — Identify and Evaluate All Risks</div>
+              <div class="step-desc">Consider: biological agent pathogenicity, infectious dose, route of transmission, laboratory activity type (aerosol-generating vs. closed), personnel competence and health status, facility engineering controls, and environmental factors including waste management. Use HAZOP (Hazard and Operability) analysis: systematically ask "What if X fails?" for every procedure and piece of equipment.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">M</div>
+            <div class="step-content">
+              <div class="step-title">Mitigation — Implement Controls to Reduce Risk</div>
+              <div class="step-desc">Apply the Hierarchy of Controls (see Part 2). Mitigation must address root causes, not symptoms. For every identified risk, document: the specific control measure, who is responsible for implementation, the target risk score after mitigation, and the timeline for implementation. Risk below "Low" level is considered Acceptable Residual Risk.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">P</div>
+            <div class="step-content">
+              <div class="step-title">Performance — Monitor and Review Effectiveness</div>
+              <div class="step-desc">Monitoring involves regular internal audits, incident review, QC data trending, and annual full risk assessment reviews. A risk assessment is a <em>living document</em> — it must be updated whenever new pathogens, procedures, or equipment are introduced, or after any laboratory incident.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">3.3 The Swiss Cheese Model — Why Accidents Happen</h3>
+        <p>The Swiss Cheese Model (Reason, 1990) explains why laboratory accidents occur even in facilities with many safety measures. Imagine each safety layer (SOP, PPE, engineering control, training) as a slice of Swiss cheese — each layer has holes (gaps/failures). An accident occurs only when the holes in <strong>all layers align simultaneously</strong>, allowing a hazard to pass through.</p>
+        <div class="callout success">
+          <div class="callout-title">✅ Management Implication</div>
+          Your job as a laboratory manager is to <strong>reduce the size and number of holes</strong> in each slice. No single control is perfect. You must stack multiple layers. When an incident occurs, the Swiss Cheese analysis reveals which holes aligned — directing your corrective action to close those specific gaps.
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PART 4 ══ -->
+    <section class="part-section" id="part4">
+      <div class="part-header">
+        <div class="part-badge">04</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Four</div>
+          <h2 class="part-title">Containment &amp; Facility Design — HVAC Engineering</h2>
+        </div>
+      </div>
+
+      <p>The facility itself is primary containment. Senior laboratory technologists and managers must be able to <strong>read and verify architectural and mechanical plans</strong>. Facility design errors are impossible to correct cheaply after construction.</p>
+
+      <div class="sub-section">
+        <h3 class="sub-title">4.1 Pressure Gradients — The Physics of Containment</h3>
+        <p>In a BSL-2/3 laboratory, air must <strong>always flow inward</strong> — from clean corridor into the laboratory — never the reverse. This is achieved by maintaining the lab at negative pressure relative to adjacent spaces.</p>
+        <div class="formula-block">
+          <span class="formula-label">Pressure Differential Requirements</span>
+          BSL-2 Lab vs. Hallway:  −12.5 Pa minimum (negative pressure)
+          BSL-3 Lab vs. Anteroom: −25 Pa minimum
+          BSL-3 Anteroom vs. Hallway: −12.5 Pa minimum
+          
+          Verification tool: Digital manometer — read DAILY by lab staff.
+          Alarm action: If pressure alarm sounds → CEASE all aerosol work immediately.
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">4.2 The "Dirty-to-Clean" Workflow Design</h3>
+        <p>Physical segregation of pathways is <strong>mandatory</strong> in all well-designed medical laboratories. Contamination travels only one direction:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Zone</th><th>Function</th><th>Access Control</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Dirty Corridor / Zone</strong></td><td>Receiving clinical specimens, disposing of contaminated waste, exiting soiled equipment</td><td>Restricted — lab personnel only</td></tr>
+              <tr><td><strong>Laboratory Core</strong></td><td>Processing, testing, and analysis</td><td>Restricted — trained personnel with PPE</td></tr>
+              <tr><td><strong>Clean Corridor / Zone</strong></td><td>Issuing reports, clean PPE storage, staff changing in/out</td><td>Supervised access</td></tr>
+              <tr><td><strong>Pass-Through Autoclave</strong></td><td>Double-ended unit set in wall between dirty lab and clean disposal area — materials enter dirty, exit sterile</td><td>Engineering barrier</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">4.3 Key Design Parameters — At a Glance</h3>
+        <ul class="content-list">
+          <li><strong>Directional Airflow:</strong> Air flows from clean → contaminated areas; exhausted through HEPA filters (100% exhaust in BSL-3).</li>
+          <li><strong>HEPA Filtration:</strong> High-Efficiency Particulate Air filters capture ≥99.97% of particles ≥0.3 µm. Annual certification required.</li>
+          <li><strong>Physical Barriers:</strong> Solid walls, self-closing airtight doors, pass-through chambers with interlocking doors.</li>
+          <li><strong>Waste Handling Systems:</strong> Decontamination before discharge — pass-through autoclaves, liquid effluent decontamination systems.</li>
+          <li><strong>Emergency Systems:</strong> Backup generator (UPS), fire suppression compatible with lab contents, emergency eyewash and safety showers.</li>
+          <li><strong>Surfaces:</strong> Non-porous, chemical-resistant benchtops (epoxy resin), seamless flooring with coved base (no crevices for contamination accumulation).</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══ PART 5 ══ -->
+    <section class="part-section" id="part5">
+      <div class="part-header">
+        <div class="part-badge">05</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Five</div>
+          <h2 class="part-title">Safe Laboratory Procedures — SOPs, GLP &amp; PPE</h2>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">5.1 Standard Operating Procedures (SOPs) — The 5-S Framework</h3>
+        <p>SOPs are not just bureaucratic documents — they are legal instruments and training tools. A poorly written SOP, or one not followed, creates liability. Use the <strong>5-S Framework</strong> to ensure every SOP is complete:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Element</th><th>What it Covers</th><th>Example Content</th></tr></thead>
+            <tbody>
+              <tr><td><strong>S — Scope</strong></td><td>What test or procedure does this SOP describe?</td><td>"This SOP covers malaria RDT testing for all samples received in the microbiology section."</td></tr>
+              <tr><td><strong>S — Standards</strong></td><td>What are the acceptance criteria (QC limits)?</td><td>"Control line must appear within 20 minutes. Invalid results must be repeated."</td></tr>
+              <tr><td><strong>S — Sequence</strong></td><td>Step-by-step instructions including what NOT to do</td><td>Numbered steps with explicit prohibited actions highlighted.</td></tr>
+              <tr><td><strong>S — Safety</strong></td><td>Specific PPE and hazard warnings for this procedure</td><td>"Minimum PPE: nitrile gloves, lab coat, and eye protection when handling blood samples."</td></tr>
+              <tr><td><strong>S — Storage</strong></td><td>Post-test sample/reagent storage requirements</td><td>"Dispose of used RDT cassettes in yellow infectious waste container within 2 hours."</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout warning">
+          <div class="callout-title">⚠️ Document Control — Version Management</div>
+          Every SOP must carry a <strong>version number</strong> (e.g., v3.0) and a review date. When a new version is issued, ALL old copies must be physically destroyed or stamped "OBSOLETE" in red. A staff member using an outdated HIV testing algorithm because the old SOP was left in a drawer is a serious patient safety failure — and a common accreditation finding.
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">5.2 Personal Protective Equipment (PPE) — Selection and Use</h3>
+        <p>PPE selection must be <strong>hazard-specific</strong>. Generic gloves alone are insufficient. Train your team on the sequence: donning (putting on) before entering hazardous areas, and doffing (removing) in the correct sequence to prevent self-contamination when leaving.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>PPE Item</th><th>Protects Against</th><th>Critical Use Rule</th></tr></thead>
+            <tbody>
+              <tr><td>Nitrile Gloves (double-glove for BSL-3)</td><td>Biological and chemical hazards to hands</td><td>Change between each patient; discard if torn or contaminated</td></tr>
+              <tr><td>Lab Coat / Fluid-Resistant Gown</td><td>Splash and contamination of personal clothing</td><td>Never wear outside the laboratory; dedicated lab coat per section</td></tr>
+              <tr><td>Safety Goggles / Face Shield</td><td>Splash to eyes from blood, chemicals, aerosols</td><td>Required for all centrifuge work and open-tube manipulation</td></tr>
+              <tr><td>Surgical Mask / N-95 Respirator</td><td>Surgical mask: splash. N-95: airborne particles ≥0.3 µm (TB work)</td><td>N-95 requires fit-testing annually; not interchangeable with surgical mask</td></tr>
+              <tr><td>Closed-Toe Shoes</td><td>Dropped sharps and chemical spills</td><td>Mandatory — sandals prohibited in all clinical laboratory sections</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">5.3 Good Laboratory Practices (GLP) — Core Prohibitions</h3>
+        <ul class="content-list">
+          <li>No eating, drinking, smoking, or applying cosmetics in the laboratory (mouth contamination risk).</li>
+          <li>Hand washing with soap and water for ≥20 seconds before leaving the laboratory — hand sanitizer is a supplement, not a substitute when hands are visibly contaminated.</li>
+          <li>Decontaminate work surfaces at the start of the day, after each task, and at the end of each shift.</li>
+          <li>All containers must be clearly labeled with contents, concentration, and hazard classification.</li>
+          <li>Never pipette by mouth — use mechanical pipetting devices only.</li>
+          <li>Report all accidents, incidents, and near-misses immediately, regardless of perceived severity.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══ PART 6 ══ -->
+    <section class="part-section" id="part6">
+      <div class="part-header">
+        <div class="part-badge">06</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Six</div>
+          <h2 class="part-title">Decontamination, Sterilization &amp; Disinfection — The Science of Killing</h2>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">6.1 Key Terminology — Precise Definitions</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Term</th><th>Definition</th><th>Example Agent</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Sterilization</strong></td><td>Complete destruction of ALL microorganisms, including bacterial endospores (highest level)</td><td>Autoclaving, dry heat, ionizing radiation</td></tr>
+              <tr><td><strong>High-Level Disinfection</strong></td><td>Kills all organisms except high numbers of spores</td><td>Glutaraldehyde 2%, hydrogen peroxide 7.5%</td></tr>
+              <tr><td><strong>Intermediate Disinfection</strong></td><td>Kills mycobacteria, most viruses, fungi; may not kill all spores</td><td>70% isopropyl alcohol, iodophors</td></tr>
+              <tr><td><strong>Low-Level Disinfection</strong></td><td>Kills most bacteria, some viruses and fungi; does not kill mycobacteria or spores</td><td>Quaternary ammonium compounds (Quats)</td></tr>
+              <tr><td><strong>Antisepsis</strong></td><td>Destruction of microorganisms on living tissue — must be non-toxic to skin</td><td>Chlorhexidine, povidone-iodine</td></tr>
+              <tr><td><strong>Decontamination</strong></td><td>Removal/reduction of contaminants to a safe level — a process, not an endpoint</td><td>Autoclaving soiled instruments</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">6.2 Sterilization Kinetics — The D-Value (University-Level)</h3>
+        <p>For examinations, you must understand <strong>why</strong> specific sterilization parameters are set, not just what they are. Microbial death follows first-order kinetics — populations die at a constant rate relative to their size.</p>
+        <div class="formula-block">
+          <span class="formula-label">The D-Value (Decimal Reduction Time)</span>
+          D-Value = Time required to kill 90% (1 log₁₀ cycle) of a microbial population
+          
+          Clinical Application:
+          If an autoclave cycle kills 1 log per minute at 121°C...
+          Starting population of 10⁶ spores:
+          → After 6 minutes: 10⁰ = 1 survivor
+          → After 12 minutes: 10⁻⁶ = theoretical 0.000001 probability of a single survivor
+          
+          Standard autoclave cycles are set for at least 12 D-Values of reduction.
+          This is called the "Sterility Assurance Level" (SAL) of 10⁻⁶.
+        </div>
+        <p><strong>Why use Geobacillus stearothermophilus spores as biological indicators?</strong> Because these spores have a very high D-value at 121°C — they are among the most heat-resistant organisms known. If the autoclave cycle kills these spores, you have mathematical certainty that all less-resistant organisms are also dead. A negative biological indicator (spore strip — no growth) is your highest-level sterility assurance.</p>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">6.3 Chemical Disinfectant Selection Matrix — Kenya Context</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Disinfectant</th><th>Mechanism of Action</th><th>Kenyan Application</th><th>Critical Limitation</th></tr></thead>
+            <tbody>
+              <tr><td>Sodium Hypochlorite (bleach)</td><td>Oxidizes cellular proteins, disrupts membranes</td><td>0.5% (10,000 ppm) for blood/TB spills; 0.1% for general surfaces</td><td>Rapidly inactivated by organic matter (blood/serum). Pre-clean first, then disinfect. Must be freshly prepared daily.</td></tr>
+              <tr><td>70% Isopropyl/Ethanol</td><td>Denatures proteins and dissolves lipid membranes</td><td>Clean bench-tops, BSC glass surfaces, skin antisepsis</td><td>Completely ineffective against spores. Evaporates quickly (contact time insufficient if area is large). FLAMMABLE.</td></tr>
+              <tr><td>Glutaraldehyde (2%)</td><td>Alkylation of nucleic acids and proteins (high-level)</td><td>Cold sterilization of heat-sensitive flexible endoscopes (not common in general path)</td><td>Highly toxic — irritates mucous membranes and respiratory tract. Must only be used in a fume hood. Requires activation before use.</td></tr>
+              <tr><td>Quaternary Ammonium Compounds (Quats)</td><td>Disrupts cell membranes; low-level disinfectant</td><td>Environmental surface cleaning in non-critical areas</td><td>NOT effective against TB (mycobacteria), most spores, or non-enveloped viruses. Often misused as a "general disinfectant."</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout danger">
+          <div class="callout-title">⚠️ Minimum Contact Time — Non-Negotiable</div>
+          For HIV/TB blood spills: contact time with 0.5% NaOCl must be <strong>at least 30 minutes</strong>. You cannot wipe immediately. The disinfectant must remain wet and in contact with the contaminated area for the full contact time. This rule is frequently violated and is a common examination question.
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PART 7 ══ -->
+    <section class="part-section" id="part7">
+      <div class="part-header">
+        <div class="part-badge">07</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Seven</div>
+          <h2 class="part-title">Chemical Safety &amp; the Chemical Hygiene Plan (CHP)</h2>
+        </div>
+      </div>
+
+      <p>Kenya has adopted the <strong>Globally Harmonized System (GHS)</strong> for chemical classification and labeling. Every laboratory manager must understand GHS hazard categories and be able to read a Safety Data Sheet (SDS).</p>
+
+      <div class="sub-section">
+        <h3 class="sub-title">7.1 GHS Hazard Classification</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>GHS Category</th><th>Description</th><th>Common Lab Examples</th><th>Key Control</th></tr></thead>
+            <tbody>
+              <tr><td>Flammable</td><td>Easily ignited; flash point &lt;60°C</td><td>Ethanol, acetone, xylene, ether</td><td>Approved flammable storage cabinets; no open flames nearby</td></tr>
+              <tr><td>Corrosive</td><td>Cause irreversible tissue damage</td><td>HCl, H₂SO₄, NaOH, glacial acetic acid</td><td>Chemical splash goggles mandatory; store acids and bases separately</td></tr>
+              <tr><td>Toxic / Acutely Toxic</td><td>Harmful or fatal in small amounts</td><td>Methanol, sodium azide, cyanide reagents</td><td>Fume hood use; minimize quantities on bench</td></tr>
+              <tr><td>Carcinogenic</td><td>Capable of causing cancer (Category 1A/1B)</td><td>Xylene, formalin (formaldehyde), benzene</td><td>Substitute with safer alternatives where possible; exposure monitoring</td></tr>
+              <tr><td>Reactive / Explosive</td><td>Unstable; may explode under certain conditions</td><td>Perchloric acid (when mixed with organics)</td><td>Never mix with incompatibles; store per manufacturer SDS</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">7.2 Critical Chemical Incompatibilities — Never Mix These</h3>
+        <div class="callout danger">
+          <div class="callout-title">🚫 Dangerous Chemical Combinations</div>
+          <ul class="content-list" style="margin:0">
+            <li><strong>HCl + Bleach (NaOCl):</strong> Produces highly toxic Chlorine gas (Cl₂) — can be lethal in confined spaces.</li>
+            <li><strong>Cyanide + Acid:</strong> Produces Hydrogen Cyanide (HCN) gas — rapidly fatal.</li>
+            <li><strong>Acids + Bases:</strong> Highly exothermic reaction; may cause violent boiling and spattering. Store separately.</li>
+            <li><strong>Xylene + Strong Oxidizers:</strong> Fire and explosion hazard in histology processing areas.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">7.3 Waste Management — Categories and Disposal</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Waste Category</th><th>Colour Code (Kenya)</th><th>Examples</th><th>Disposal Method</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Infectious / Pathological</strong></td><td>🟡 Yellow</td><td>Blood-soaked materials, cultures, infected specimens, anatomical waste</td><td>Autoclaving then incineration; or direct high-temperature incineration</td></tr>
+              <tr><td><strong>Sharp Waste</strong></td><td>🔴 Red / Yellow (puncture-proof)</td><td>Needles, lancets, scalpels, broken glass</td><td>Puncture-proof containers; incineration when ¾ full (never compress)</td></tr>
+              <tr><td><strong>Chemical Waste</strong></td><td>🟤 Brown / Black (labeled)</td><td>Reagents, solvents, formalin, xylene</td><td>NEMA-licensed chemical waste disposal contractor</td></tr>
+              <tr><td><strong>Pharmaceutical Waste</strong></td><td>⬛ Black</td><td>Expired reagents, controls, calibrators</td><td>Return to manufacturer or licensed disposal</td></tr>
+              <tr><td><strong>General / Domestic</strong></td><td>⬛ Black/Green</td><td>Paper, packaging (not contaminated)</td><td>Regular municipal solid waste collection</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PART 8 ══ -->
+    <section class="part-section" id="part8">
+      <div class="part-header">
+        <div class="part-badge">08</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Eight</div>
+          <h2 class="part-title">Laboratory Resource Management — Supply Chain &amp; Equipment</h2>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">8.1 Inventory Management — ABC Analysis</h3>
+        <p>Not all laboratory supplies deserve equal attention. The <strong>ABC Analysis</strong> (Pareto Principle applied to inventory) directs management effort proportionally to cost and criticality.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Category</th><th>% of Budget</th><th>% of Stock Lines</th><th>Review Frequency</th><th>Kenyan Examples</th></tr></thead>
+            <tbody>
+              <tr><td><strong>A — High Value/Critical</strong></td><td>~70-80%</td><td>~10-20%</td><td>Weekly / Continuous monitoring</td><td>CD4 reagents, HIV rapid tests, haematology reagents, culture media</td></tr>
+              <tr><td><strong>B — Medium Value</strong></td><td>~15-25%</td><td>~30%</td><td>Monthly</td><td>Biochemistry reagents, slides, tubes</td></tr>
+              <tr><td><strong>C — Low Value/Bulk</strong></td><td>~5%</td><td>~50-60%</td><td>Quarterly</td><td>Cotton wool, gauze, labels, specimen bags</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="formula-block">
+          <span class="formula-label">Safety Stock Calculation (Critical for Kenya's Supply Chain Reality)</span>
+          Safety Stock = Average Daily Usage × Emergency Lead Time (days)
+          
+          Example: CD4 reagents
+          Average Daily Usage = 20 tests/day
+          Emergency Lead Time = 30 days (Mombasa port + customs + distribution)
+          Safety Stock = 20 × 30 = 600 test minimum buffer stock
+          
+          Reorder Point = Safety Stock + (Average Daily Usage × Standard Lead Time)
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">8.2 Cold Chain Management — Kenya-Specific Considerations</h3>
+        <p>Kenya's power infrastructure challenges (load shedding, voltage fluctuations) make cold chain management a <strong>critical clinical skill</strong>, not just an administrative task. Reagent failures due to temperature excursions are a leading cause of invalid results in resource-limited settings.</p>
+        <ul class="content-list">
+          <li><strong>Data Loggers:</strong> All 2–8°C refrigerators must have continuous temperature data loggers. Review min/max graphs daily and sign the log. A forgotten temperature excursion is a liability.</li>
+          <li><strong>Corrective Action Protocol:</strong> If refrigerator temperature exceeds 8°C: (1) Quarantine all reagents immediately, (2) Contact manufacturer for guidance, (3) Run QC on a known control material before resuming patient testing, (4) Document and report. Do NOT assume reagents are still valid.</li>
+          <li><strong>UPS / Generator:</strong> Refrigerators storing critical reagents must be on uninterruptible power supply or generator backup. Include in your procurement justification.</li>
+          <li><strong>Freeze-Thaw Cycles:</strong> Many reagents (especially monoclonal antibodies in immunohaematology) are destroyed by freeze-thaw cycling. Aliquot reagents that cannot withstand repeated freezing.</li>
+        </ul>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">8.3 Equipment Management — The Full Lifecycle</h3>
+        <div class="steps-wrap">
+          <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">Installation &amp; Commissioning</div><div class="step-desc">Verify equipment against purchase specifications. Document serial numbers, software versions, and installation conditions. Never put equipment into clinical service without a commissioning check.</div></div></div>
+          <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">Calibration</div><div class="step-desc">Regular performance verification against traceable reference materials. Frequency per manufacturer's specification and QC data trends. Document calibration results and attach certificates.</div></div></div>
+          <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Preventive Maintenance (PM)</div><div class="step-desc">Scheduled maintenance per manufacturer's checklist (daily, weekly, monthly, annual). PM extends equipment life and prevents unexpected downtime. Maintain a PM log for each piece of equipment.</div></div></div>
+          <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Repair &amp; Validation Post-Repair</div><div class="step-desc">After any repair, the equipment MUST be validated with QC material and reference samples before returning to patient testing. Never assume a repaired instrument performs correctly without verification.</div></div></div>
+          <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">Decommissioning</div><div class="step-desc">Decontaminate before disposal, removal, or service. Follow NEMA regulations for electronic waste. Remove from active equipment inventory and document decommissioning.</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PART 9 ══ -->
+    <section class="part-section" id="part9">
+      <div class="part-header">
+        <div class="part-badge">09</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Nine</div>
+          <h2 class="part-title">The Total Testing Cycle — Managing Preanalytical Errors</h2>
+        </div>
+      </div>
+
+      <p>Research consistently shows that <strong>up to 70% of all laboratory errors occur in the pre-analytical phase</strong> — before a sample even reaches the analyser. As a manager, this is where your quality improvement efforts will have the greatest patient impact.</p>
+
+      <div class="sub-section">
+        <h3 class="sub-title">9.1 The Three Phases of the Testing Cycle</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Phase</th><th>Steps Involved</th><th>Common Error Sources</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Pre-Analytical (~70% of errors)</strong></td><td>Test ordering, patient identification, patient preparation, specimen collection, transport, receipt, processing</td><td>Wrong patient ID, incorrect order, wrong tube type, haemolysis, contamination, delayed transport, mislabeling</td></tr>
+              <tr><td><strong>Analytical (~15% of errors)</strong></td><td>Test performance, QC assessment, result generation</td><td>Instrument malfunction, reagent failure, QC not checked, interference effects</td></tr>
+              <tr><td><strong>Post-Analytical (~15% of errors)</strong></td><td>Result verification, reporting, interpretation, data storage</td><td>Transcription errors, reporting to wrong patient, critical value not communicated, misinterpretation</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">9.2 Phlebotomy — Critical Variables</h3>
+        <div class="callout warning">
+          <div class="callout-title">⚠️ Order of Draw — CLSI Standards (Critical to Memorise)</div>
+          The correct order of draw prevents carryover of additives between tubes:
+          <ol class="content-list" style="margin-top:10px">
+            <li>Blood Cultures (sterile technique first)</li>
+            <li>Sodium Citrate (light blue — coagulation studies)</li>
+            <li>Serum / SST (red / gold — biochemistry, serology)</li>
+            <li>Lithium Heparin (green — plasma chemistry)</li>
+            <li>EDTA (purple — haematology, full blood count)</li>
+            <li>Fluoride-Oxalate (grey — glucose, lactate)</li>
+          </ol>
+          <strong>Exam pitfall:</strong> Drawing EDTA before Citrate causes EDTA's potassium-chelating action to contaminate the coagulation sample → falsely prolonged APTT. This is a reportable pre-analytical error.
+        </div>
+        <p><strong>Haemolysis Management:</strong> Free haemoglobin released from lysed red cells interferes with spectrophotometric assays (LDH, Potassium, Bilirubin). Advanced labs report a <strong>Haemolysis Index (HI)</strong> to clinicians alongside affected results. Implement a policy: "Results with HI &gt;2+ must be reported with the comment: 'Result may be affected by in-vitro haemolysis; clinical correlation advised.'"</p>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">9.3 Laboratory Information Management System (LIMS)</h3>
+        <p>A LIMS is the digital backbone of a modern laboratory. Under the <strong>Kenya Data Protection Act (2019)</strong>, patient laboratory results are classified as <em>sensitive personal data</em> with specific handling requirements:</p>
+        <ul class="content-list">
+          <li><strong>Audit Trails:</strong> The LIMS must log who accessed, modified, or reported each result — with timestamp and user ID. Unauthorized access to patient data is a criminal offence.</li>
+          <li><strong>Critical Value Notifications:</strong> The LIMS must flag critical values (e.g., K⁺ &gt; 6.5 mmol/L, Hb &lt; 5 g/dL) for immediate telephonic communication to the clinician, with verbal read-back documented in the system.</li>
+          <li><strong>Backup and Disaster Recovery:</strong> Data must be backed up at minimum daily, with off-site storage. Test the restoration process quarterly — a backup you cannot restore is not a backup.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══ PART 10 ══ -->
+    <section class="part-section" id="part10">
+      <div class="part-header">
+        <div class="part-badge">10</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Ten</div>
+          <h2 class="part-title">Quality Management — Six Sigma, Westgard Rules &amp; QMS</h2>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">10.1 Sigma Metrics — The Modern QC Framework</h3>
+        <p>The <strong>Sigma metric (σ)</strong> is a single number that tells you how well your analytical method performs relative to clinical requirements. It integrates both imprecision and inaccuracy into one quality score.</p>
+        <div class="formula-block">
+          <span class="formula-label">Sigma Metric Formula</span>
+          σ = (TEa % − |Bias %|) / CV %
+          
+          Where:
+          TEa  = Total Allowable Error (from CLIA/RCPAQAP guidelines — clinically acceptable error)
+          Bias = Systematic error (your method's average deviation from truth)
+          CV   = Coefficient of Variation (your method's random error / imprecision)
+          
+          Example: Glucose analyser
+          TEa = 10%, Bias = 2%, CV = 2%
+          σ = (10 − 2) / 2 = 4.0 sigma → Adequate; use multi-rule QC
+        </div>
+        <div class="sigma-bar-wrap">
+          <div class="sigma-bar-track">
+            <div class="sigma-seg" style="width:16.6%;background:#EF4444;">σ≤2</div>
+            <div class="sigma-seg" style="width:16.6%;background:#F97316;">σ3</div>
+            <div class="sigma-seg" style="width:16.6%;background:#F59E0B;">σ4</div>
+            <div class="sigma-seg" style="width:16.6%;background:#84CC16;">σ5</div>
+            <div class="sigma-seg" style="width:16.6%;background:#10B981;">σ6</div>
+            <div class="sigma-seg" style="width:16.6%;background:#14B8A6;">σ&gt;6</div>
+          </div>
+          <div class="sigma-labels">
+            <span>Unacceptable</span><span>Poor</span><span>Marginal</span><span>Good</span><span>Excellent</span><span>World Class</span>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Sigma Level</th><th>Performance</th><th>QC Strategy</th><th>QC Frequency</th></tr></thead>
+            <tbody>
+              <tr><td><strong>σ ≥ 6</strong></td><td>World-class — exceptional quality</td><td>Single rule: 1₃s only</td><td>Every 1000 patients or shift</td></tr>
+              <tr><td><strong>σ 5–6</strong></td><td>Excellent</td><td>1₃s + 2₂s</td><td>Every 500 patients</td></tr>
+              <tr><td><strong>σ 4–5</strong></td><td>Good — acceptable</td><td>Westgard multi-rules</td><td>Every 200 patients</td></tr>
+              <tr><td><strong>σ 3–4</strong></td><td>Marginal — borderline acceptable</td><td>Intensive multi-rules (6+ rules)</td><td>Every 50–100 patients</td></tr>
+              <tr><td><strong>σ &lt; 3</strong></td><td>Unacceptable — method must be improved or replaced</td><td>Do not use for patient testing</td><td>Not applicable</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">10.2 Westgard Rules — Systematic vs. Random Error Detection</h3>
+        <p>Westgard multi-rules help distinguish between <strong>random errors</strong> (acceptable chance variation) and <strong>systematic errors</strong> (consistent bias indicating a problem). Key rules to know:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rule</th><th>Trigger</th><th>Error Type</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1₂s</strong></td><td>1 control exceeds ±2 SD</td><td>Warning only (not rejection)</td><td>Proceed with caution; inspect for trends</td></tr>
+              <tr><td><strong>1₃s</strong></td><td>1 control exceeds ±3 SD</td><td>Random error</td><td>Reject run; investigate immediately</td></tr>
+              <tr><td><strong>2₂s</strong></td><td>2 consecutive controls exceed ±2 SD on same side</td><td>Systematic error (shift or drift)</td><td>Reject run; check calibration and reagents</td></tr>
+              <tr><td><strong>R₄s</strong></td><td>Range between 2 controls exceeds 4 SD</td><td>Random error</td><td>Reject run; check for pipetting error</td></tr>
+              <tr><td><strong>10x</strong></td><td>10 consecutive controls on same side of mean</td><td>Systematic drift (slow, insidious)</td><td>Reject run; recalibrate; check reagent lot change</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PART 11 ══ -->
+    <section class="part-section" id="part11">
+      <div class="part-header">
+        <div class="part-badge">11</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Eleven</div>
+          <h2 class="part-title">Personnel Management — Just Culture &amp; Competency</h2>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">11.1 The Just Culture Model — Moving Beyond Blame</h3>
+        <p>The outdated "name, blame, shame" approach to laboratory errors suppresses incident reporting and prevents systemic learning. The <strong>Just Culture Model</strong> distinguishes between three types of unsafe behaviour and responds appropriately to each:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Behaviour Type</th><th>Description</th><th>Example</th><th>Management Response</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Human Error</strong></td><td>Inadvertent — "I didn't know / I forgot"</td><td>Junior tech forgot to check patient ID wristband</td><td>Console, retrain, and redesign the system to prevent recurrence (double-check protocol)</td></tr>
+              <tr><td><strong>At-Risk Behaviour</strong></td><td>Knew the SOP but chose a shortcut — risk not appreciated</td><td>Tech skipped QC because "the machine was working fine yesterday"</td><td>Coach on the risk, increase supervision, and address workload root causes</td></tr>
+              <tr><td><strong>Reckless Behaviour</strong></td><td>Knowingly and unjustifiably took a substantial risk</td><td>Falsified QC records to avoid repeat runs</td><td>Disciplinary action up to dismissal and KMLTTB licence review</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">11.2 Competency Assessment Programme</h3>
+        <p>Competency assessment is <strong>mandatory for ISO 15189 compliance</strong>. It must be objective, documented, and cover both technical and safety skills. Assessment must occur at onboarding and then at least annually for each procedure the staff member performs.</p>
+        <ul class="content-list">
+          <li><strong>Direct Observation of Routine Work:</strong> Watch the technologist perform the actual procedure (phlebotomy, Gram staining, operating the full blood count analyser) under normal working conditions.</li>
+          <li><strong>Blind Proficiency Testing (Internal):</strong> Insert unknown specimens with known results into the daily workload. Record if the staff member gets the correct result without knowing it is a test sample.</li>
+          <li><strong>Safety Drills (Surprise):</strong> Unannounced fire evacuation or spill response drill. Tests real-time knowledge, not memorized answers. Document who performed correctly and who did not.</li>
+          <li><strong>Record Review:</strong> Assess the accuracy, completeness, and timeliness of the staff member's records and documentation over the assessment period.</li>
+          <li><strong>Written/Practical Examination:</strong> For specific specialized procedures (e.g., TB culture, blood grouping), formal examinations provide additional validation of theoretical knowledge.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══ PART 12 ══ -->
+    <section class="part-section" id="part12">
+      <div class="part-header">
+        <div class="part-badge">12</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Twelve</div>
+          <h2 class="part-title">Laboratory Policy &amp; Documentation Control</h2>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">12.1 The Document Hierarchy</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Level</th><th>Document Type</th><th>What it Contains</th><th>Who Approves</th></tr></thead>
+            <tbody>
+              <tr><td>Level 1</td><td><strong>Quality Manual</strong></td><td>Overall quality policy, scope of QMS, organizational structure</td><td>Laboratory Director / CMO</td></tr>
+              <tr><td>Level 2</td><td><strong>Standard Operating Procedures (SOPs)</strong></td><td>Detailed work instructions for specific procedures</td><td>Section Head + Laboratory Manager</td></tr>
+              <tr><td>Level 3</td><td><strong>Work Instructions / Quick Reference Cards</strong></td><td>Abbreviated step-by-step guides at the bench</td><td>Section Head</td></tr>
+              <tr><td>Level 4</td><td><strong>Forms, Records, Logs</strong></td><td>Evidence that procedures were followed (QC charts, temperature logs, instrument maintenance logs)</td><td>Completed by operator</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">12.2 Kenyan Regulatory Framework — Key Legal Instruments</h3>
+        <ul class="content-list">
+          <li><strong>Legal Notice 13 of 2006:</strong> Medical Laboratory Technicians and Technologists (Curriculum and Course Content) Regulations — the legal basis for your training programme.</li>
+          <li><strong>Laboratory Biosafety and Biosecurity Policy Guidelines (Government of Kenya, 2014):</strong> The national biosafety framework that all Kenyan labs must implement.</li>
+          <li><strong>Kenya Laboratory Biorisk Management Curriculum, 2nd Edition (2019):</strong> The operational biosafety training standard, based on the CWA 15793 international framework.</li>
+          <li><strong>Kenya Data Protection Act (2019):</strong> Governs handling of patient data by laboratory information systems.</li>
+          <li><strong>ISO 15189:2022:</strong> The international accreditation standard — replacing ISO 15189:2012 — specifying requirements for quality and competence in medical laboratories.</li>
+          <li><strong>WHO Laboratory Biosafety Manual, 4th Edition (2020):</strong> The global reference, now emphasizing evidence-based, risk-proportionate biosafety — moving away from prescriptive BSL rules towards tailored risk assessment.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══ PART 13 ══ -->
+    <section class="part-section" id="part13">
+      <div class="part-header">
+        <div class="part-badge">13</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Thirteen</div>
+          <h2 class="part-title">Transport of Infectious Substances — IATA DGR</h2>
+        </div>
+      </div>
+
+      <p>As a laboratory manager, you may be a certified <strong>"Dangerous Goods Shipper"</strong> under IATA (International Air Transport Association) Dangerous Goods Regulations. Non-compliance can result in fines and removal from air transport programmes — critical for KEMRI and public health reference laboratory operations.</p>
+
+      <div class="sub-section">
+        <h3 class="sub-title">13.1 Classification — Category A vs. Category B</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>Category A</th><th>Category B</th></tr></thead>
+            <tbody>
+              <tr><td><strong>UN Number</strong></td><td>UN 2814 (human/animal) or UN 2900 (animal only)</td><td>UN 3373</td></tr>
+              <tr><td><strong>Criterion</strong></td><td>Capable of causing permanent disability or life-threatening or fatal disease in otherwise healthy humans/animals when exposure occurs</td><td>Does not meet Category A criteria</td></tr>
+              <tr><td><strong>Examples</strong></td><td>Live Ebola, live M. tuberculosis cultures, live rabies virus</td><td>Routine clinical specimens (blood, urine, swabs), inactivated/fixed specimens, dried blood spots</td></tr>
+              <tr><td><strong>Packaging</strong></td><td>Full P650 packaging; specific labeling mandatory</td><td>P650 simplified; "Biological Substance, Category B" diamond label</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">13.2 The Triple Packaging System — Category A</h3>
+        <div class="steps-wrap">
+          <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">Primary Receptacle</div><div class="step-desc">Leak-proof, sealed specimen tube or container. Wrapped in sufficient absorbent material (e.g., paper towels) to absorb the entire contents if broken. Critical: the absorbent must be between the primary and secondary containers.</div></div></div>
+          <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">Secondary Packaging</div><div class="step-desc">Watertight, leak-proof bag or rigid secondary container. Multiple primary containers may be placed in one secondary container if they are individually wrapped. Include the specimen list inside this layer.</div></div></div>
+          <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Outer Packaging</div><div class="step-desc">Rigid outer box (UN-certified). Must display: biohazard symbol, UN number, proper shipping name ("Infectious Substance, Affecting Humans"), shipper/receiver details, emergency contact, and quantity of dry ice (if used — must state net weight in kg, as sublimating CO₂ can rupture the package in cargo holds).</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PART 14 ══ -->
+    <section class="part-section" id="part14">
+      <div class="part-header">
+        <div class="part-badge">14</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Fourteen</div>
+          <h2 class="part-title">Emergency Preparedness &amp; Occupational Health Surveillance</h2>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">14.1 Spill Management — Advanced Protocol</h3>
+        <p>For a <strong>high-risk spill</strong> (e.g., centrifuge rotor crack releasing a TB-positive sputum aerosol), standard wipe-and-clean is inadequate and dangerous. Follow this advanced protocol:</p>
+        <div class="steps-wrap">
+          <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">Evacuate &amp; Close</div><div class="step-desc">Clear the room immediately. Close the door. Post a biohazard warning notice. Alert the laboratory manager.</div></div></div>
+          <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">Wait for Aerosol Settlement (≥30 minutes)</div><div class="step-desc">Airborne TB particles (droplet nuclei, 1–5 µm) remain suspended for up to 30 minutes. Re-entering before settlement negates all PPE effectiveness.</div></div></div>
+          <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Full PPE Donning</div><div class="step-desc">Double-glove, N-95 (or PAPR — Powered Air-Purifying Respirator for high-risk exposures), impermeable apron or gown, eye protection. Have a buddy witness and assist with donning sequence.</div></div></div>
+          <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Apply Disinfectant — Edges First</div><div class="step-desc">CRITICAL technique: pour 0.5–1% NaOCl around the <em>edges</em> of the spill first, working inward toward the center. This prevents splashing the agent outward. Never pour directly onto the center of a large spill.</div></div></div>
+          <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">Contact Time — 30 Minutes</div><div class="step-desc">Allow disinfectant to remain in contact for the full 30 minutes. Do not disturb. Add more disinfectant if the area dries out.</div></div></div>
+          <div class="step-item"><div class="step-num">6</div><div class="step-content"><div class="step-title">Mechanical Clean-up &amp; Terminal Clean</div><div class="step-desc">Use an autoclavable scoop and pan to remove solids. Wipe with absorbent material. Follow with 70% ethanol wipe to remove corrosive bleach residue (especially on centrifuge rotor metal). All clean-up materials go into yellow infectious waste.</div></div></div>
+          <div class="step-item"><div class="step-num">7</div><div class="step-content"><div class="step-title">Doff PPE Correctly &amp; Report</div><div class="step-desc">Remove PPE in correct order (gloves last). Wash hands. Complete an Incident Report within 24 hours. Initiate investigation.</div></div></div>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">14.2 Post-Exposure Prophylaxis (PEP) for HIV — Manager's Protocol</h3>
+        <div class="callout danger">
+          <div class="callout-title">🚨 Time-Critical — Maximum Effectiveness Window: 72 Hours</div>
+          PEP must be started within <strong>2 hours</strong> of exposure for maximum effectiveness. Effectiveness declines after 24 hours. After 72 hours, PEP is not indicated. The laboratory manager must ensure the PEP starter pack (TLD — Tenofovir/Lamivudine/Dolutegravir, per current Kenya ARV guidelines) is accessible 24/7.
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Action</th><th>Timeline</th><th>Responsible</th></tr></thead>
+            <tbody>
+              <tr><td>First aid (wash exposed area with soap and running water; allow bleeding for puncture wounds)</td><td>Immediately</td><td>Exposed staff</td></tr>
+              <tr><td>Report to supervisor; access PEP starter pack</td><td>Within 1 hour</td><td>Supervisor / Lab Manager</td></tr>
+              <tr><td>Baseline HIV test (with consent); start PEP</td><td>Within 2 hours (ideal)</td><td>Occupational Health / Medical Officer</td></tr>
+              <tr><td>Incident report completion</td><td>Within 24 hours</td><td>Supervisor</td></tr>
+              <tr><td>Follow-up HIV testing</td><td>6 weeks, 3 months, 6 months</td><td>Occupational Health</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">14.3 Fire Safety — RACE and PASS</h3>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <span class="ref-card-icon">🔥</span>
+            <div class="ref-card-title">RACE — Fire Response</div>
+            <div class="ref-card-body">
+              <strong>R</strong> — Rescue anyone in immediate danger<br>
+              <strong>A</strong> — Alarm — activate fire alarm and call 999<br>
+              <strong>C</strong> — Contain — close all doors to limit spread<br>
+              <strong>E</strong> — Evacuate — exit via designated routes, account for all personnel
+            </div>
+          </div>
+          <div class="ref-card">
+            <span class="ref-card-icon">🧯</span>
+            <div class="ref-card-title">PASS — Extinguisher Use</div>
+            <div class="ref-card-body">
+              <strong>P</strong> — Pull the pin (breaks tamper seal)<br>
+              <strong>A</strong> — Aim at the BASE of the fire (not the flames)<br>
+              <strong>S</strong> — Squeeze the handle slowly<br>
+              <strong>S</strong> — Sweep side-to-side at the base
+            </div>
+          </div>
+        </div>
+        <div class="callout warning">
+          <div class="callout-title">⚠️ Fire Extinguisher Selection in Labs</div>
+          Class B (CO₂ or Dry Powder) for flammable liquid fires. <strong>Never use water</strong> on electrical or chemical fires. CO₂ extinguishers are preferred in labs as they leave no residue on instruments. Familiarise yourself with extinguisher locations and types during orientation — before a fire occurs.
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">14.4 Occupational Health Surveillance Programme</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Programme Component</th><th>Frequency</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>Pre-employment medical examination</td><td>Before commencing work</td><td>Establish baseline health, identify contraindications to specific exposures</td></tr>
+              <tr><td>Hepatitis B vaccination (3-dose series: 0, 1, 6 months)</td><td>On employment; verify antibody titre (anti-HBs ≥10 IU/L)</td><td>Protect against the most common occupational bloodborne infection in Kenya</td></tr>
+              <tr><td>Annual Chest X-ray</td><td>All staff in microbiology, BSL-3 sections</td><td>TB surveillance — early detection of occupationally acquired TB</td></tr>
+              <tr><td>Spirometry (lung function)</td><td>Annual for histology/chemistry staff</td><td>Monitor for occupational respiratory disease from formalin, xylene, acid fumes</td></tr>
+              <tr><td>Annual general health check</td><td>Yearly</td><td>General wellness monitoring; update immunizations</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PART 15 ══ -->
+    <section class="part-section" id="part15">
+      <div class="part-header">
+        <div class="part-badge">15</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Part Fifteen</div>
+          <h2 class="part-title">Incident Management — Reporting, Investigation &amp; Root Cause Analysis</h2>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">15.1 Types of Events to Report</h3>
+        <ul class="content-list">
+          <li><strong>Accidents:</strong> Unintended events that cause actual harm (needle-stick, chemical splash, patient misidentification with wrong results reported).</li>
+          <li><strong>Incidents:</strong> Unintended events that caused no harm but had the potential to do so.</li>
+          <li><strong>Near Misses:</strong> Events that <em>almost</em> caused harm but were caught by existing safety systems. These are the most valuable learning opportunities — they reveal where your defences are thin.</li>
+          <li><strong>Sentinel Events:</strong> Serious patient harm or death resulting from a laboratory error — requires immediate notification to facility management and regulatory bodies.</li>
+        </ul>
+        <div class="callout info">
+          <div class="callout-title">📌 Culture of Reporting</div>
+          A laboratory with <strong>zero incidents reported</strong> is not necessarily safe — it may simply have a culture of fear and under-reporting. A hallmark of a mature quality system is a <em>high near-miss reporting rate</em> coupled with <em>low serious incident rate</em>. Celebrate near-miss reports. They are gifts.
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">15.2 Root Cause Analysis Tools</h3>
+        <p>Surface-level investigation ("the tech was careless") does not prevent recurrence. True root cause analysis (RCA) identifies the <strong>system failures</strong> that allowed the error to happen.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tool</th><th>Method</th><th>Best Used For</th></tr></thead>
+            <tbody>
+              <tr><td><strong>5 Whys</strong></td><td>Ask "why?" five times consecutively to drill from symptom to root cause</td><td>Simple, single-cause incidents; rapid analysis</td></tr>
+              <tr><td><strong>Fishbone (Ishikawa) Diagram</strong></td><td>Map causes across 6 M categories: Man, Machine, Material, Method, Measurement, Mother Nature (Environment)</td><td>Complex, multi-factorial incidents; brainstorming team sessions</td></tr>
+              <tr><td><strong>Failure Mode and Effects Analysis (FMEA)</strong></td><td>Proactively identify potential failure modes before an incident occurs; score by Severity × Occurrence × Detectability</td><td>New equipment/procedure implementation; high-risk process redesign</td></tr>
+              <tr><td><strong>Swiss Cheese Model Analysis</strong></td><td>Map which layers of defense failed and how they aligned to allow the incident</td><td>Understanding systemic failures in multi-layered safety systems</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3 class="sub-title">15.3 The CAPA Cycle — Corrective and Preventive Action</h3>
+        <div class="steps-wrap">
+          <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">Identify the Non-Conformance</div><div class="step-desc">Document the specific deviation from policy, procedure, or expected quality outcome. Be precise and factual — avoid language like "careless" or "didn't try."</div></div></div>
+          <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">Contain Immediate Impact</div><div class="step-desc">Quarantine affected samples, results, or equipment. Alert clinicians if patient results may have been affected. Prevent further non-conforming output while the investigation is ongoing.</div></div></div>
+          <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Conduct Root Cause Analysis</div><div class="step-desc">Use the appropriate RCA tool. Involve the front-line staff who were present — they have the most accurate account. Avoid premature conclusions.</div></div></div>
+          <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Implement Corrective Action</div><div class="step-desc">Address the identified root cause — not just the symptom. Assign specific individuals, deadlines, and required resources for each action. Document in the CAPA register.</div></div></div>
+          <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">Implement Preventive Action</div><div class="step-desc">Consider: could this same failure happen elsewhere in the lab, or in a different process? Apply the learning laterally across the system.</div></div></div>
+          <div class="step-item"><div class="step-num">6</div><div class="step-content"><div class="step-title">Verify Effectiveness</div><div class="step-desc">After implementation, collect objective evidence that the corrective action worked. Did the error recur? Did the target indicator improve? Close the CAPA only when effectiveness is confirmed.</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ EXAM CHECKLIST ══ -->
+    <section class="part-section" id="checklist">
+      <div class="part-header">
+        <div class="part-badge">✓</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Revision</div>
+          <h2 class="part-title">Examination Readiness Checklist</h2>
+        </div>
+      </div>
+      <p>Before sitting your examination, you must be able to confidently demonstrate each of the following competencies. Use this list for self-assessment during revision:</p>
+      <div class="checklist">
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Design a <strong>complete biorisk assessment</strong> for a new pathogen entering the lab (e.g., Mpox virus) — including risk equation scoring, AMP model application, and control selection rationale.</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Calculate the <strong>Sigma metric</strong> for a given analyser (using TEa, Bias, and CV) and select the appropriate Westgard QC rules and frequency.</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Apply the <strong>Swiss Cheese Model</strong> to a centrifuge aerosolization incident — identifying which defence layers failed and recommending specific corrective actions for each.</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Draft a <strong>Chemical Hygiene Plan section</strong> for a histology lab using Xylene — covering GHS hazard class, SDS-specified controls, engineering requirements (fume hood), and waste disposal pathway.</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Explain the <strong>correct order of blood draw</strong> and justify why incorrect order causes specific pre-analytical errors (e.g., EDTA before citrate → APTT interference).</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Describe the <strong>D-Value concept</strong> and explain why Geobacillus stearothermophilus spores are used as biological indicators in autoclave validation.</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Distinguish between the <strong>three behaviour types in Just Culture</strong> (human error, at-risk, reckless) and describe the appropriate management response to each.</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Outline the <strong>HIV PEP protocol</strong> — including timing windows, current recommended regimen (TLD), baseline testing, and follow-up schedule per Kenyan guidelines.</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Describe <strong>pressure gradient requirements</strong> for BSL-2 and BSL-3 labs, how they are measured, and what action is taken when a pressure alarm activates.</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Apply <strong>ABC analysis</strong> to a laboratory supply inventory and calculate safety stock for a critical reagent given usage and lead time data.</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Classify an infectious substance shipment as <strong>Category A or B</strong>, select the appropriate UN number, and describe the triple packaging requirements.</div></div>
+        <div class="checklist-item"><div class="check-box"></div><div class="check-text">Conduct a <strong>5 Whys analysis</strong> and construct a Fishbone (Ishikawa) diagram for a specimen mislabeling event in the haematology section.</div></div>
+      </div>
+    </section>
+
+    <!-- ══ REFERENCES ══ -->
+    <section class="part-section" id="refs">
+      <div class="part-header">
+        <div class="part-badge">📖</div>
+        <div class="part-title-group">
+          <div class="part-eyebrow">Bibliography</div>
+          <h2 class="part-title">Key References &amp; Recommended Reading</h2>
+        </div>
+      </div>
+      <div class="ref-grid">
+        <div class="ref-card"><span class="ref-card-icon">🌍</span><div class="ref-card-title">WHO Laboratory Biosafety Manual, 4th Edition (2020)</div><div class="ref-card-body">The global reference — now emphasizing evidence-based, risk-proportionate biosafety over prescriptive BSL rules. Free download at who.int</div></div>
+        <div class="ref-card"><span class="ref-card-icon">🇰🇪</span><div class="ref-card-title">Kenya Laboratory Biorisk Management Curriculum, 2nd Edition (2019)</div><div class="ref-card-body">The national operational biosafety training standard, incorporating CWA 15793 framework. Primary reference for all Kenyan labs.</div></div>
+        <div class="ref-card"><span class="ref-card-icon">🏛️</span><div class="ref-card-title">Laboratory Biosafety & Biosecurity Policy Guidelines — GoK (2014)</div><div class="ref-card-body">The national biosafety policy framework mandating minimum standards for all Kenya laboratories. Legal compliance reference.</div></div>
+        <div class="ref-card"><span class="ref-card-icon">📐</span><div class="ref-card-title">ISO 15189:2022</div><div class="ref-card-body">Medical laboratories — Requirements for quality and competence. Current version replacing 2012 edition. The accreditation standard for KENAS.</div></div>
+        <div class="ref-card"><span class="ref-card-icon">🧪</span><div class="ref-card-title">Westgard QC — Basic QC Practices</div><div class="ref-card-body">James O. Westgard's textbook on statistical quality control for clinical labs. Available at westgard.com with free online resources.</div></div>
+        <div class="ref-card"><span class="ref-card-icon">✈️</span><div class="ref-card-title">IATA Dangerous Goods Regulations (DGR) — Current Edition</div><div class="ref-card-body">Mandatory reference for all labs shipping infectious substances internationally. Updated annually. Training certification required for shippers.</div></div>
+      </div>
+
+      <div class="callout info" style="margin-top:32px">
+        <div class="callout-title">📌 Academic Integrity Notice</div>
+        These notes are compiled for educational and study purposes. They are a synthesis of authoritative sources for the benefit of BSc Medical Laboratory Science students. Always supplement with your course instructors' materials, prescribed textbooks, and practical sessions. Clinical practice must be guided by current institutional protocols, manufacturer guidelines, and Kenyan regulatory requirements.
+      </div>
+    </section>
+
+  </div><!-- end content-area -->
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-note">BSc Medical Laboratory Science · Kenyan University Curriculum · Advanced Study Notes</div>
+  <div class="footer-badge">ISO 15189:2022 Aligned</div>
+</footer>
+
+<script>
+  // Active nav highlighting on scroll
+  const sections = document.querySelectorAll('[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+  const backTop = document.getElementById('backTop');
+
+  function updateActiveNav() {
+    let current = '';
+    sections.forEach(sec => {
+      const top = sec.getBoundingClientRect().top;
+      if (top < 100) current = sec.id;
+    });
+    navItems.forEach(item => {
+      item.classList.remove('active');
+      if (item.getAttribute('href') === '#' + current) {
+        item.classList.add('active');
+      }
+    });
+    backTop.classList.toggle('visible', window.scrollY > 400);
+  }
+
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  updateActiveNav();
+
+  // Sidebar nav search filter
+  function filterNav(q) {
+    const term = q.toLowerCase();
+    navItems.forEach(item => {
+      item.style.display = item.textContent.toLowerCase().includes(term) ? '' : 'none';
+    });
+    document.querySelectorAll('.nav-group-label').forEach(label => {
+      label.style.display = '';
+    });
+  }
+
+  // Close sidebar on mobile when clicking a link
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 900) {
+        document.querySelector('.sidebar').classList.remove('open');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
