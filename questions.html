@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medical Laboratory Management & Biosafety — Assessment</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --accent: #00d4aa;
+    --accent2: #6366f1;
+    --accent3: #f59e0b;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --border: rgba(255,255,255,0.07);
+    --glow: rgba(0,212,170,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 20%, rgba(99,102,241,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 80% 80%, rgba(0,212,170,0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 60% 30%, rgba(245,158,11,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* Hero Header */
+  .hero {
+    padding: 64px 0 48px;
+    text-align: center;
+    position: relative;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,212,170,0.1);
+    border: 1px solid rgba(0,212,170,0.3);
+    border-radius: 999px;
+    padding: 6px 18px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero-badge::before { content: '⚗'; font-size: 14px; }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, var(--accent) 50%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 560px;
+    margin: 0 auto 32px;
+  }
+
+  /* Score Dashboard */
+  .score-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  .score-card:hover { transform: translateY(-2px); }
+  .score-card .val {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .score-card .lbl { font-size: 11px; color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; margin-top: 4px; }
+
+  /* Section headers */
+  .section-header {
+    display: flex; align-items: center; gap: 16px;
+    margin: 48px 0 28px;
+  }
+  .section-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: rgba(0,212,170,0.1);
+    border: 1px solid rgba(0,212,170,0.25);
+    border-radius: 8px;
+    padding: 5px 12px;
+    white-space: nowrap;
+  }
+  .section-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* Question cards */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .q-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    border-radius: 3px 0 0 3px;
+  }
+  .q-card:hover { border-color: rgba(0,212,170,0.2); box-shadow: 0 0 0 1px rgba(0,212,170,0.1); }
+
+  .q-num {
+    font-size: 11px; font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .q-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  /* MCQ options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.18s;
+    background: var(--surface2);
+  }
+  .option:hover { border-color: rgba(0,212,170,0.35); background: rgba(0,212,170,0.06); }
+  .option input[type="radio"] { display: none; }
+  .opt-dot {
+    width: 20px; height: 20px; min-width: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+    transition: all 0.18s;
+    font-size: 10px;
+  }
+  .option.selected .opt-dot {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+  }
+  .opt-label { font-size: 14px; color: var(--text); line-height: 1.5; }
+  .option.correct { border-color: var(--success) !important; background: rgba(34,197,94,0.08) !important; }
+  .option.wrong { border-color: var(--danger) !important; background: rgba(239,68,68,0.08) !important; }
+  .option.correct .opt-dot { border-color: var(--success); background: var(--success); color: #fff; }
+  .option.wrong .opt-dot { border-color: var(--danger); background: var(--danger); color: #fff; }
+
+  /* Feedback */
+  .feedback {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: none;
+    line-height: 1.5;
+    border-left: 3px solid;
+  }
+  .feedback.correct { background: rgba(34,197,94,0.1); border-color: var(--success); color: #86efac; }
+  .feedback.wrong { background: rgba(239,68,68,0.1); border-color: var(--danger); color: #fca5a5; }
+  .feedback.show { display: block; }
+
+  /* Short answer */
+  .short-answer {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .short-answer textarea {
+    width: 100%;
+    min-height: 90px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .short-answer textarea:focus { border-color: rgba(0,212,170,0.4); }
+
+  .reveal-btn {
+    align-self: flex-start;
+    padding: 9px 20px;
+    background: rgba(99,102,241,0.15);
+    border: 1px solid rgba(99,102,241,0.35);
+    border-radius: 8px;
+    color: #a5b4fc;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .reveal-btn:hover { background: rgba(99,102,241,0.25); }
+
+  .model-answer {
+    background: rgba(99,102,241,0.08);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 13.5px;
+    color: #c7d2fe;
+    line-height: 1.7;
+    display: none;
+  }
+  .model-answer.show { display: block; }
+  .model-answer strong { color: #a5b4fc; }
+
+  /* Long answer */
+  .long-answer textarea {
+    min-height: 160px;
+  }
+
+  /* Submit & results */
+  .submit-zone {
+    text-align: center;
+    padding: 48px 0 32px;
+  }
+  .submit-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--accent), #00b894);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 24px rgba(0,212,170,0.3);
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,212,170,0.4); }
+
+  .result-banner {
+    background: var(--surface);
+    border: 1px solid rgba(0,212,170,0.25);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    margin-top: 32px;
+    display: none;
+    box-shadow: 0 0 40px rgba(0,212,170,0.1);
+  }
+  .result-banner.show { display: block; }
+  .result-banner .big-score {
+    font-family: 'Syne', sans-serif;
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .result-banner .grade { font-size: 20px; font-weight: 600; color: var(--accent); margin: 8px 0 4px; }
+  .result-banner .msg { color: var(--muted); font-size: 14px; }
+
+  /* Progress bar */
+  .progress-wrap { margin-bottom: 40px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; width: 0%; transition: width 0.4s ease; }
+
+  .dna-banner {
+    text-align: center;
+    font-size: 32px;
+    letter-spacing: 4px;
+    color: rgba(0,212,170,0.15);
+    margin: 8px 0;
+    user-select: none;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  footer {
+    text-align: center;
+    padding: 40px 0 24px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  /* Responsive */
+  @media(max-width: 600px) {
+    .score-board { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 28px; }
+    .q-card { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">BSc Medical Laboratory Science</div>
+    <h1>Medical Laboratory Management<br>&amp; Biosafety</h1>
+    <p>Comprehensive assessment covering Biosafety, Risk Management, Quality Control, Decontamination, Resource Management &amp; Occupational Health — aligned with Kenyan University curriculum.</p>
+    <div class="dna-banner">⚗ 🔬 🧬 🦠 🧪 ⚗ 🔬 🧬 🦠 🧪 ⚗ 🔬 🧬</div>
+  </div>
+
+  <!-- Score board -->
+  <div class="score-board">
+    <div class="score-card">
+      <div class="val" id="mcq-score">0/50</div>
+      <div class="lbl">MCQ Score</div>
+    </div>
+    <div class="score-card">
+      <div class="val" id="answered-count">0</div>
+      <div class="lbl">Questions Answered</div>
+    </div>
+    <div class="score-card">
+      <div class="val" id="total-q">80</div>
+      <div class="lbl">Total Questions</div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Progress</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <!-- ===== SECTION A: MCQ ===== -->
+  <div class="section-header">
+    <span class="section-num">Section A</span>
+    <h2>Multiple Choice Questions</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div id="mcq-section">
+  <!-- MCQs will be injected by JS -->
+  </div>
+
+  <!-- ===== SECTION B: SHORT ANSWER ===== -->
+  <div class="section-header">
+    <span class="section-num">Section B</span>
+    <h2>Short Answer Questions</h2>
+    <div class="section-line"></div>
+  </div>
+  <div id="short-section"></div>
+
+  <!-- ===== SECTION C: LONG ANSWER ===== -->
+  <div class="section-header">
+    <span class="section-num">Section C</span>
+    <h2>Long Answer / Essay Questions</h2>
+    <div class="section-line"></div>
+  </div>
+  <div id="long-section"></div>
+
+  <!-- Submit -->
+  <div class="submit-zone">
+    <button class="submit-btn" onclick="submitMCQ()">⚡ Submit MCQs &amp; See Score</button>
+    <div class="result-banner" id="result-banner">
+      <div class="big-score" id="final-score">0%</div>
+      <div class="grade" id="final-grade"></div>
+      <div class="msg" id="final-msg"></div>
+    </div>
+  </div>
+
+  <footer>Medical Laboratory Management &amp; Biosafety — Assessment Tool | For educational use only | Kenyan University Curriculum</footer>
+</div>
+
+<script>
+const mcqs = [
+  {
+    q: "What percentage of clinical diagnoses in modern Kenyan healthcare rely on laboratory results?",
+    opts: ["Over 50%", "Over 70%", "Over 40%", "Over 90%"],
+    ans: 1,
+    exp: "Over 70% of clinical diagnoses rely on laboratory results, making the lab the central nervous system of clinical decision-making."
+  },
+  {
+    q: "Which Kenyan body provides accreditation services for medical laboratories?",
+    opts: ["KEMRI", "KMA", "KENAS", "NEMA"],
+    ans: 2,
+    exp: "KENAS (Kenya Accreditation Service) is the sole accrediting body for medical laboratories in Kenya, moving labs towards ISO 15189:2022 compliance."
+  },
+  {
+    q: "What is the international standard specifying requirements for quality and competence in medical laboratories?",
+    opts: ["ISO 9001", "ISO 14001", "ISO 15189", "ISO 45001"],
+    ans: 2,
+    exp: "ISO 15189 specifically addresses competence of medical staff and the clinical utility of results, making it preferred over the general business quality standard ISO 9001."
+  },
+  {
+    q: "In the Hierarchy of Biosafety Controls, which control is considered MOST effective?",
+    opts: ["Personal Protective Equipment (PPE)", "Administrative Controls (SOPs)", "Engineering Controls (BSCs)", "Elimination/Substitution"],
+    ans: 3,
+    exp: "Elimination or Substitution is the most effective control — removing the hazard entirely (e.g., using non-infectious surrogates) is always preferred over mitigating exposure."
+  },
+  {
+    q: "Why should you NEVER use an open flame (Bunsen burner) inside a Class II Type A2 BSC?",
+    opts: ["It damages the HEPA filter", "It disrupts laminar airflow causing turbulent eddies that pull contaminants out", "It is a fire hazard to the glass", "It inactivates biological samples"],
+    ans: 1,
+    exp: "Heat from a Bunsen burner disrupts the delicate laminar airflow in the BSC, creating turbulent eddies that can pull contaminants out of the cabinet onto the user."
+  },
+  {
+    q: "Which biosafety level is required for handling airborne Mycobacterium tuberculosis cultures?",
+    opts: ["BSL-1", "BSL-2", "BSL-3", "BSL-4"],
+    ans: 2,
+    exp: "BSL-3 is required for M. tuberculosis cultures. It requires double-door entry, anterooms, and 100% exhaust HEPA filtration (no recirculation)."
+  },
+  {
+    q: "The Biorisk Equation states: Risk = ?",
+    opts: ["Hazard × Exposure", "Probability × Severity", "Likelihood × Vulnerability", "Frequency × Impact"],
+    ans: 1,
+    exp: "Risk = (Probability of an Event) × (Severity of Consequence). This guides quantitative risk assessment in the laboratory."
+  },
+  {
+    q: "In laboratory facility design, what direction must air flow in a BSL-2/3 lab relative to the corridor?",
+    opts: ["From lab to corridor (outward)", "From corridor to lab (inward)", "Bidirectional", "Horizontally only"],
+    ans: 1,
+    exp: "Air must flow from the clean corridor INTO the laboratory (inward) — maintained by negative pressure (e.g., -50 Pa relative to hallway) to prevent contaminated air from escaping."
+  },
+  {
+    q: "What does the D-Value (Decimal Reduction Time) represent in sterilization science?",
+    opts: ["Time to kill all organisms", "Time to reduce microbial population by 10-fold (1 log cycle)", "Temperature needed for sterilization", "Concentration of chemical needed"],
+    ans: 1,
+    exp: "D-Value is the time required at a specific temperature/concentration to kill 90% (one log cycle / 10-fold reduction) of a specific microorganism population."
+  },
+  {
+    q: "Which biological indicator is used to verify autoclave sterilization effectiveness?",
+    opts: ["Bacillus anthracis", "Geobacillus stearothermophilus spores", "Clostridium difficile", "E. coli ATCC 25922"],
+    ans: 1,
+    exp: "Geobacillus (formerly Bacillus) stearothermophilus spores are used because they have a very high D-Value at 121°C — if they are killed, everything else is sterilized."
+  },
+  {
+    q: "What concentration of sodium hypochlorite (bleach) should be used for HIV/TB blood spills in a Kenyan lab?",
+    opts: ["0.1% (1,000 ppm)", "0.5% (10,000 ppm)", "5% (50,000 ppm)", "0.01% (100 ppm)"],
+    ans: 1,
+    exp: "0.5% (10,000 ppm) sodium hypochlorite is used for blood spills. Lower concentrations (0.1%) are for general surface decontamination."
+  },
+  {
+    q: "What minimum contact time is required when decontaminating a HIV/TB spill with sodium hypochlorite?",
+    opts: ["5 minutes", "10 minutes", "30 minutes", "60 minutes"],
+    ans: 2,
+    exp: "At least 30 minutes contact time is required before wiping. You cannot simply wipe up a biohazardous spill immediately after applying disinfectant."
+  },
+  {
+    q: "What does the Sigma metric (σ) formula measure in Quality Control?",
+    opts: ["The speed of a laboratory test", "The laboratory's statistical process quality: (TEa% - Bias%) / CV%", "The number of quality control failures per month", "The ratio of correct to incorrect results"],
+    ans: 1,
+    exp: "σ = (TEa% - Bias%) / CV%. A σ ≥ 6 indicates world-class performance; σ ≤ 3 indicates the method is unsuitable for the environment."
+  },
+  {
+    q: "In quality control, what does a Sigma score of ≤ 3 indicate?",
+    opts: ["Excellent performance — use simple 1₃s rules", "The method is unsuitable; use multi-rules and frequent QC", "Normal acceptable performance", "Perfect calibration"],
+    ans: 1,
+    exp: "σ ≤ 3 indicates poor method performance. You must apply multi-Westgard rules (1₂s, R₄s, 2₂s, 4₁s, 10x) and increase QC frequency."
+  },
+  {
+    q: "Which waste disposal color-coding applies to infectious/biological waste in Kenyan labs?",
+    opts: ["Red containers", "Yellow containers", "Green containers", "Black containers"],
+    ans: 1,
+    exp: "Yellow containers are used for infectious/biological waste in Kenyan medical laboratories. Red is used for sharps (though practices may vary by facility)."
+  },
+  {
+    q: "What does the 'Just Culture' model in personnel management address?",
+    opts: ["A policy of zero tolerance for all errors", "Balancing discipline with safety by distinguishing human error, at-risk behavior, and reckless behavior", "Only punishing senior staff for errors", "Eliminating written policies"],
+    ans: 1,
+    exp: "The Just Culture model distinguishes between Human Error (retrain), At-Risk Behavior (coach), and Reckless Behavior (disciplinary action) — balancing accountability with safety."
+  },
+  {
+    q: "In supply chain management, what does ABC Analysis 'A' category represent?",
+    opts: ["Low-cost, low-frequency items", "Items costing ~80% of the budget (e.g., CD4 reagents), requiring weekly monitoring", "Administrative supplies only", "Archived items no longer in use"],
+    ans: 1,
+    exp: "ABC Analysis: 'A' items cost ~80% of the budget (like CD4 reagents), monitored weekly. 'C' items are cheap bulk supplies monitored monthly."
+  },
+  {
+    q: "What is the recommended Safe Stock Formula for preventing reagent stock-outs?",
+    opts: ["Annual usage ÷ 12", "Average Daily Usage × Emergency Lead Time", "Monthly order × 2", "Total budget ÷ cost per unit"],
+    ans: 1,
+    exp: "Minimum/Safety Stock = Average Daily Usage × Emergency Lead Time. For Kenyan labs, reagent lead time through Mombasa can be 4–6 weeks."
+  },
+  {
+    q: "Which phase of the Total Testing Cycle accounts for up to 70% of laboratory errors?",
+    opts: ["Analytical phase", "Post-analytical phase", "Pre-analytical phase", "Quality control phase"],
+    ans: 2,
+    exp: "Up to 70% of laboratory errors occur in the Pre-analytical phase (patient identification, specimen collection, transport, and processing)."
+  },
+  {
+    q: "What is the correct Order of Draw for venipuncture according to CLSI standards (first to last)?",
+    opts: ["EDTA → Citrate → Serum → Blood Culture", "Blood Culture → Citrate → Serum → Heparin → EDTA", "Heparin → EDTA → Citrate → Serum", "Serum → Blood Culture → Heparin → EDTA"],
+    ans: 1,
+    exp: "Correct order: Blood Culture → Citrate (blue) → Serum (red/gold) → Heparin (green) → EDTA (purple) → Glycolysis inhibitor. Drawing EDTA before Citrate cross-contaminates potassium into coagulation tests."
+  },
+  {
+    q: "According to the Globally Harmonized System (GHS), what category of hazard is Xylene?",
+    opts: ["Category 1 Explosive", "Category 2 Carcinogen", "Category 3 Irritant only", "Category 4 Environmental hazard"],
+    ans: 1,
+    exp: "Xylene is a GHS Category 2 Carcinogen commonly used in histology. It requires a fume hood (exhausting to outside), NOT a BSC (which recirculates air)."
+  },
+  {
+    q: "What is the UN number for Category A infectious substances (e.g., Ebola, TB culture)?",
+    opts: ["UN 3373", "UN 2814", "UN 1845", "UN 3291"],
+    ans: 1,
+    exp: "UN 2814 applies to Category A infectious substances capable of causing permanent disability, life-threatening, or fatal disease. UN 3373 applies to Category B."
+  },
+  {
+    q: "During a high-risk centrifuge spill (e.g., TB-positive sputum), how long must you wait before re-entering to allow aerosols to settle?",
+    opts: ["5 minutes", "10 minutes", "15 minutes", "30 minutes"],
+    ans: 3,
+    exp: "After evacuating and closing the door, you must wait a minimum of 30 minutes for aerosols to settle before re-entering a room with a high-risk spill."
+  },
+  {
+    q: "Under Kenyan law, within what timeframe must a staff member exposed to HIV begin Post-Exposure Prophylaxis (PEP)?",
+    opts: ["Within 12 hours", "Within 24 hours", "Within 72 hours (ideally within 2 hours)", "Within 1 week"],
+    ans: 2,
+    exp: "PEP must begin within 72 hours of exposure (ideally within 2 hours). The standard Kenyan PEP regimen is TLD (Tenofovir/Lamivudine/Dolutegravir)."
+  },
+  {
+    q: "How often should follow-up HIV testing be conducted after a needlestick exposure?",
+    opts: ["At 6 weeks only", "At 3 months and 6 months only", "At 6 weeks, 3 months, and 6 months", "At 1 year only"],
+    ans: 2,
+    exp: "After baseline testing at the time of exposure, follow-up HIV tests are conducted at 6 weeks, 3 months, and 6 months."
+  },
+  {
+    q: "What is SLIPTA?",
+    opts: ["A type of biosafety cabinet", "Stepwise Laboratory Quality Improvement Process Towards Accreditation", "A Kenyan law on laboratory practice", "A chemical sterilization method"],
+    ans: 1,
+    exp: "SLIPTA (Stepwise Laboratory Quality Improvement Process Towards Accreditation) has been used since 2010 in Kenya to prepare labs and improve quality management systems before full ISO 15189 accreditation."
+  },
+  {
+    q: "The Swiss Cheese Model in laboratory safety means:",
+    opts: ["The lab should be divided into zones like Swiss cheese holes", "Multiple layers of safety defense must all fail simultaneously for an incident to occur", "Only one safety measure is needed if it is strong", "Holes in safety barriers are acceptable if rare"],
+    ans: 1,
+    exp: "The Swiss Cheese Model: each defense layer (SOPs, PPE, Engineering) has 'holes,' but an incident only occurs when holes in all layers align simultaneously. The goal is minimizing hole size in each layer."
+  },
+  {
+    q: "Which cooling temperature range is required for reagents like HbA1c kits in laboratory cold chain management?",
+    opts: ["0–2°C", "2–8°C", "10–15°C", "-20°C"],
+    ans: 1,
+    exp: "Most refrigerated reagents including HbA1c kits require 2–8°C storage. Daily review of data logger minimum/maximum temperature graphs is essential, especially in Kenya where power outages are common."
+  },
+  {
+    q: "What does FIFO stand for in laboratory inventory management?",
+    opts: ["First In, First Out", "Fast Inventory Flow Order", "Frequency Index of Fast Orders", "Final Inspection For Output"],
+    ans: 0,
+    exp: "FIFO (First In, First Out) means the oldest stock is used first, preventing expiry of reagents and supplies. This is a fundamental inventory management principle."
+  },
+  {
+    q: "Which Kenyan regulatory body mandates that all laboratory heads must be licensed?",
+    opts: ["KEMRI", "NEMA", "KMLTTB (Kenya Medical Laboratory Technicians and Technologists Board)", "KNH"],
+    ans: 2,
+    exp: "KMLTTB (Kenya Medical Laboratory Technicians and Technologists Board) mandates licensing and competency certificates for all lab heads in Kenya."
+  },
+  {
+    q: "What type of airflow does a BSL-3 facility require for its exhaust?",
+    opts: ["50% HEPA filtered recirculation", "100% exhaust with HEPA filtration (no recirculation)", "Natural ventilation only", "Positive pressure with recirculation"],
+    ans: 1,
+    exp: "BSL-3 facilities require 100% exhaust HEPA filtration — no recirculation of air. This prevents potentially infectious aerosols from being re-introduced into the workspace."
+  },
+  {
+    q: "In the 'AMP Model' for biorisk management, what does 'P' stand for?",
+    opts: ["Prevention", "Protection", "Performance (monitoring and evaluating effectiveness)", "Policy"],
+    ans: 2,
+    exp: "AMP = Assessment (identify/evaluate risks) → Mitigation (implement controls) → Performance (monitor and evaluate effectiveness of controls). 'P' is Performance."
+  },
+  {
+    q: "Class II Type A2 BSCs recirculate what percentage of HEPA-filtered air back into the cabinet?",
+    opts: ["30%", "50%", "70%", "100%"],
+    ans: 2,
+    exp: "Class II Type A2 BSCs recirculate 70% of HEPA-filtered air back into the cabinet and exhaust 30%, providing personnel, product, and environmental protection."
+  },
+  {
+    q: "Why is Glutaraldehyde (2%) reserved for specialized use only in Kenyan labs?",
+    opts: ["It is too expensive", "It is ineffective against bacteria", "It produces highly toxic fumes and requires activation — used only for cold sterilization of heat-sensitive equipment", "It damages all plastic surfaces"],
+    ans: 2,
+    exp: "Glutaraldehyde is highly toxic (respiratory/skin irritant), requires chemical activation, and has a short working life. It's reserved for cold sterilization of heat-sensitive items like scopes."
+  },
+  {
+    q: "Which document controls the hierarchy of all laboratory quality documentation?",
+    opts: ["SOP Manual", "Quality Manual (overarching quality policies and objectives)", "Incident Report Log", "Procurement Register"],
+    ans: 1,
+    exp: "The Quality Manual sits at the top of the document hierarchy. Below it are SOPs (detailed work instructions), then Forms and Records (documentation of activities)."
+  },
+  {
+    q: "What does TEa stand for in Sigma metric calculations?",
+    opts: ["Testing Error average", "Total Equipment Age", "Total Allowable Error", "Time to Error Analysis"],
+    ans: 2,
+    exp: "TEa = Total Allowable Error. It is derived from international quality guidelines (e.g., CLIA, Ricos). The Sigma formula uses it to evaluate if a method's performance is acceptable."
+  },
+  {
+    q: "In the specimen order of draw, what happens if EDTA (purple) tube is drawn before the Citrate (blue) tube?",
+    opts: ["No effect on results", "Potassium from EDTA contaminates the coagulation test, causing a falsely prolonged APTT", "The blood will clot in the tube", "Hemolysis will occur"],
+    ans: 1,
+    exp: "EDTA chelates calcium. If EDTA is drawn before the citrate tube, trace EDTA contamination will chelate calcium in the coagulation sample, giving a falsely prolonged APTT."
+  },
+  {
+    q: "The Incident Command System (ICS) in a laboratory emergency is best described as:",
+    opts: ["A system for purchasing emergency equipment", "A standardized management structure for coordinating emergency response personnel and resources", "A manual for documenting post-incident reports only", "A cleaning checklist after incidents"],
+    ans: 1,
+    exp: "The ICS is a standardized management structure that coordinates personnel, facilities, equipment, and communications during an emergency — applicable to lab fires, spills, or multi-casualty events."
+  },
+  {
+    q: "For a needlestick injury, what is the FIRST immediate action to take?",
+    opts: ["Report to supervisor", "Apply antiseptic immediately", "Wash the wound with soap and running water and allow bleeding", "Seek post-exposure prophylaxis"],
+    ans: 2,
+    exp: "Immediate first aid: wash wound with soap and running water and allow bleeding. Do NOT squeeze or suck the wound. Then report to supervisor, seek medical evaluation, and document the incident."
+  },
+  {
+    q: "How many BSL-3 (P3) facilities exist in Kenya, and where are they located?",
+    opts: ["2 — at KEMRI Nairobi only", "5 — four at KEMRI collaborative centers and one at ILRI", "10 — distributed across all counties", "1 — at Kenyatta National Hospital"],
+    ans: 1,
+    exp: "Kenya has five BSL-3 facilities: four at KEMRI's collaborative centers (including KEMRI-Wellcome in Kilifi and KEMRI-CDC in Kisumu) and one at the International Livestock Research Institute (ILRI)."
+  },
+  {
+    q: "What is the purpose of Bull's Algorithm (Moving Average) in modern QC?",
+    opts: ["To predict reagent expiry dates", "To track patient result averages (e.g., Mean MCHC) and detect subtle instrument drift before controls fail", "To calculate turnaround times", "To rank laboratory staff performance"],
+    ans: 1,
+    exp: "Bull's Algorithm (Moving Average) plots daily patient result averages. A shift in this average alerts the lab to subtle instrument drift BEFORE a formal QC control failure occurs — early warning system."
+  },
+  {
+    q: "Which Kenyan law governs patient data privacy in laboratory information systems?",
+    opts: ["The Public Health Act 2012", "The Kenya Data Protection Act (2019)", "The Medical Practitioners Act", "The Environmental Management Act"],
+    ans: 1,
+    exp: "The Kenya Data Protection Act (2019) classifies patient results as sensitive personal data. Labs must maintain audit trails in their LIS to track who viewed or altered patient data."
+  },
+  {
+    q: "What does the 'RACE' acronym stand for in fire emergency response?",
+    opts: ["Run, Alert, Contain, Evacuate", "Rescue, Alarm, Contain, Evacuate", "Report, Assess, Control, Exit", "React, Aim, Call, Extinguish"],
+    ans: 1,
+    exp: "RACE = Rescue (anyone in danger) → Alarm (activate fire alarm) → Contain (fire if possible) → Evacuate (leave the area). This is the standard fire response sequence."
+  },
+  {
+    q: "What does the 'PASS' acronym describe for fire extinguisher use?",
+    opts: ["Pull, Aim, Squeeze, Sweep", "Push, Activate, Spray, Stop", "Position, Assess, Secure, Sweep", "Point, Aim, Suppres, Stop"],
+    ans: 0,
+    exp: "PASS = Pull the pin → Aim at the base of the fire → Squeeze the handle → Sweep side to side. Always aim at the BASE (fuel source), not the flames."
+  },
+  {
+    q: "The primary difference between Biosafety and Biosecurity is:",
+    opts: ["Biosafety deals with chemicals; Biosecurity deals with microbes", "Biosafety protects people FROM biological agents; Biosecurity protects biological agents FROM people (theft/misuse)", "They are synonymous terms", "Biosecurity only applies to military laboratories"],
+    ans: 1,
+    exp: "Biosafety = protecting people from accidental exposure. Biosecurity = protecting biological materials from theft, loss, or intentional misuse. Both are essential in a modern laboratory."
+  },
+  {
+    q: "Which Health Surveillance measure is specifically recommended for BSL-3 lab staff in Kenya?",
+    opts: ["Monthly blood pressure checks only", "Annual Chest X-rays (TB surveillance) and Spirometry (for chemical fixative exposure)", "Weekly CBC (complete blood count)", "Daily temperature measurements"],
+    ans: 1,
+    exp: "BSL-3 lab staff require annual Chest X-rays for TB surveillance and Spirometry if handling aerosolized chemical fixatives like formalin."
+  },
+  {
+    q: "What chemical must NEVER be mixed with cyanide or bleach-based laboratory waste?",
+    opts: ["Ethanol", "Glycerol", "Corrosive acids (e.g., HCl)", "Xylene"],
+    ans: 2,
+    exp: "Corrosive acids (HCl) mixed with cyanide produce highly toxic Cyanogen gas; mixed with bleach they produce toxic Chlorine gas. Chemical waste must be segregated by compatibility."
+  },
+  {
+    q: "In the 5-S SOP Framework, what does the 'S' for SAFETY specifically cover?",
+    opts: ["Speed of performing the test", "Specific PPE and hazard warnings for each step in the procedure", "Storage temperature of samples", "Staff scheduling requirements"],
+    ans: 1,
+    exp: "In the 5-S SOP structure: SCOPE, STANDARDS, SEQUENCE, SAFETY (specific PPE and hazard warnings for each step), STORAGE. Safety must be integrated into every SOP."
+  },
+  {
+    q: "When must outdated SOP copies be marked 'OBSOLETE' or destroyed?",
+    opts: ["After 5 years", "Immediately after a new version is approved and distributed", "Only during annual reviews", "When the laboratory director requests it"],
+    ans: 1,
+    exp: "When an SOP is updated (new version approved), ALL old copies must be destroyed or stamped 'OBSOLETE' to prevent staff from accidentally following outdated procedures."
+  },
+  {
+    q: "A critical value of Potassium >6.5 mmol/L must be communicated using what method?",
+    opts: ["Written report only", "Electronic LIS message", "Verbal communication with read-back confirmation from the clinician", "Email to the ward"],
+    ans: 2,
+    exp: "Critical values must be communicated verbally directly to the clinician, who must read the value back to you to confirm correct receipt. Documentation of this exchange is also required."
+  },
+  {
+    q: "The Hemolysis Index in specimen management is reported because:",
+    opts: ["It indicates patient anemia", "Free hemoglobin interferes with spectrophotometric assays (e.g., LDH, Potassium), making results unreliable", "It confirms correct tube selection", "It measures clotting time"],
+    ans: 1,
+    exp: "Hemolysis releases intracellular hemoglobin which interferes with spectrophotometric tests. Reporting 'Result unreliable due to marked hemolysis' alerts clinicians and maintains result integrity."
+  }
+];
+
+const shortAnswers = [
+  { q: "Define 'D-Value' in sterilization kinetics and explain its clinical significance in autoclave operation.", ans: "<strong>D-Value (Decimal Reduction Time):</strong> The time required at a specific temperature/concentration to kill 90% (one log cycle) of a specific microorganism. <strong>Clinical significance:</strong> Autoclave cycles (121°C, 15 min) are designed for ≥6 D-values, achieving a 10⁻⁶ survival rate. Biological indicators (Geobacillus stearothermophilus spores) verify this because their high D-value means if they're killed, all pathogens are eliminated." },
+  { q: "Distinguish between Biosafety and Biosecurity with specific examples relevant to a Kenyan BSL-2 laboratory.", ans: "<strong>Biosafety</strong> protects laboratory personnel and the public FROM accidental biological hazards (e.g., using a BSC when processing HIV samples, wearing PPE). <strong>Biosecurity</strong> protects biological agents FROM people — preventing theft, loss, or misuse (e.g., locked storage of HIV reference strains, access control logs, personnel background checks). Both systems must operate simultaneously in any Kenyan clinical lab." },
+  { q: "Explain the 'Swiss Cheese Model' and how it applies to preventing needlestick injuries in a clinical laboratory.", ans: "The Swiss Cheese Model represents multiple overlapping safety layers, each with potential 'holes' (weaknesses). An incident only occurs when holes in ALL layers align simultaneously. For needlestick prevention: Layer 1 (Engineering) = Safety-engineered sharps devices; Layer 2 (Administrative) = No-recapping SOP; Layer 3 (Training) = Annual competency assessment; Layer 4 (PPE) = Double gloves. A needlestick only occurs if all four layers fail at once — the goal is continuously closing holes in each layer." },
+  { q: "List and briefly explain the AMP Model components for Biorisk Management.", ans: "<strong>A – Assessment:</strong> Systematically identify and evaluate biological risks (using risk = probability × severity matrix). Includes hazard identification, likelihood analysis, and consequence evaluation. <br><strong>M – Mitigation:</strong> Implement controls using the Hierarchy of Controls (elimination → engineering → administrative → PPE) to reduce risks to acceptable levels. <br><strong>P – Performance:</strong> Continuously monitor and evaluate the effectiveness of implemented controls through audits, incident review, and surveillance data." },
+  { q: "Describe the Triple Packaging System for transporting Category A infectious substances and explain why dry ice quantity must be labeled.", ans: "Triple packaging: (1) <strong>Primary receptacle</strong> — leak-proof container (e.g., cryovial) with absorbent material; (2) <strong>Secondary packaging</strong> — watertight, leak-proof bag or metal container; (3) <strong>Outer packaging</strong> — rigid polystyrene box with dry ice and appropriate labels/documentation. <br>Dry ice quantity must be labeled because CO₂ sublimation causes pressure build-up in the aircraft cargo hold that could rupture the package, creating an explosion hazard and potential infectious material release." },
+  { q: "What is the 'Just Culture' model in laboratory personnel management? Provide an example of each behavior type.", ans: "<strong>Just Culture</strong> balances accountability with safety by distinguishing: (1) <strong>Human Error</strong> — inadvertent mistake (e.g., forgetting to check patient ID) → Response: Retrain + redesign the process. (2) <strong>At-Risk Behavior</strong> — knew the SOP but cut corners due to workload (e.g., skipping hand hygiene when busy) → Response: Coach and address workload. (3) <strong>Reckless Behavior</strong> — willfully ignored SOP (e.g., deliberately mislabeling samples) → Response: Disciplinary action. The model avoids punishing honest mistakes while maintaining accountability." },
+  { q: "Explain the Sigma metric formula and what a Sigma score below 3 means for a glucose analyzer in a rural Kenyan laboratory.", ans: "<strong>Sigma metric:</strong> σ = (TEa% − Bias%) / CV% where TEa = Total Allowable Error (from guidelines), Bias = systematic error, CV = coefficient of variation (random error). <br>A σ < 3 for a glucose analyzer means the method's inherent imprecision and bias consume most of the allowable error budget. The analyzer is unsuitable for that environment — you would need to run multiple QC rules (1₂s, R₄s, 2₂s, 4₁s), increase QC frequency, or replace/recalibrate the method. In resource-limited Kenyan rural settings, this often triggers equipment evaluation and potential replacement." },
+  { q: "What are the immediate steps (in order) to take following a needlestick injury in a Kenyan hospital laboratory?", ans: "1. <strong>First Aid:</strong> Wash wound immediately with soap and running water; allow bleeding (do NOT squeeze/suck). 2. <strong>Apply antiseptic</strong> and cover with a waterproof dressing. 3. <strong>Report immediately</strong> to supervisor. 4. <strong>Seek medical evaluation</strong> — assess source patient's HIV/HBV status. 5. <strong>Start PEP</strong> within 2 hours (TLD regimen) if HIV risk confirmed/suspected (within 72 hours maximum). 6. <strong>Baseline HIV test</strong>. 7. <strong>Document</strong> the incident formally. 8. <strong>Follow-up HIV testing</strong> at 6 weeks, 3 months, 6 months." },
+  { q: "Distinguish between the pre-analytical, analytical, and post-analytical phases of the Total Testing Cycle. Which phase has the highest error rate and why?", ans: "<strong>Pre-analytical</strong> (before testing): test ordering, patient ID, specimen collection, transport. <strong>Analytical</strong> (during testing): actual test performance, quality control. <strong>Post-analytical</strong> (after testing): result verification, reporting, interpretation, critical value communication. <br>The <strong>pre-analytical phase</strong> has the highest error rate (~70%) because it involves many human handoffs (phlebotomist, porter, reception) with limited automation oversight, making patient misidentification, incorrect order of draw, hemolysis, and improper labeling common and difficult to detect until downstream." },
+  { q: "What does the Kenya Data Protection Act (2019) require of medical laboratories regarding patient data?", ans: "The Kenya Data Protection Act (2019) classifies patient laboratory results as sensitive personal data. Requirements include: (1) <strong>Audit trails</strong> in the Laboratory Information System (LIS) tracking who viewed or altered patient data. (2) <strong>Data minimization</strong> — only collect what's necessary. (3) <strong>Access control</strong> — only authorized personnel can access patient records. (4) <strong>Data security</strong> — protection against unauthorized access or breach. (5) <strong>Patient rights</strong> — patients may request access to their data. Non-compliance can result in legal penalties." },
+  { q: "Explain what the Chemical Hygiene Plan (CHP) must contain and why Xylene in histology requires a fume hood rather than a BSC.", ans: "A CHP must include: safety rules and policies, chemical inventory and management, storage protocols, emergency procedures, training requirements, and waste disposal protocols. <br><strong>Xylene requires a fume hood</strong> (not a BSC) because: Xylene fumes are a GHS Category 2 carcinogen. A fume hood exhausts directly OUTSIDE the building — removing toxic vapors. A Class II BSC recirculates 70% of air through HEPA filters, which do NOT capture volatile organic compounds (VOC) like xylene — so using a BSC would result in carcinogenic vapors being re-introduced into the working environment, poisoning the operator." },
+  { q: "Define 'Quality Assurance' vs 'Quality Control' in a medical laboratory context and provide two examples of each.", ans: "<strong>Quality Assurance (QA)</strong> is the broad, overall program ensuring quality throughout the laboratory — proactive and systemic. Examples: (1) Establishing quality policies and staff competency frameworks; (2) External Quality Assessment (EQA) / proficiency testing participation. <br><strong>Quality Control (QC)</strong> is the specific operational/technical activities performed daily to verify test results are accurate — reactive and test-specific. Examples: (1) Running control samples (known concentrations) with patient batches; (2) Applying Westgard rules to Levey-Jennings charts to detect out-of-control events." },
+  { q: "What is the Document Hierarchy in a laboratory quality management system? Name the three levels.", ans: "Level 1: <strong>Quality Manual</strong> — the overarching document stating quality policy, objectives, and the scope of the Quality Management System (QMS). Level 2: <strong>Standard Operating Procedures (SOPs)</strong> — detailed step-by-step work instructions for specific laboratory tasks. Level 3: <strong>Forms, Records, and Supporting Documents</strong> — evidence of activities performed (e.g., QC records, equipment maintenance logs, incident reports). Each level must be version-controlled, approved, and accessible only in its current version." },
+  { q: "What are the five levels of laboratory classification in Kenya and what services does each provide?", ans: "<strong>Class A</strong> (National Referral Hospitals) — Comprehensive specialized testing. <strong>Class B</strong> (County/Regional Hospitals) — Advanced diagnostic services. <strong>Class C</strong> (Sub-county/District Hospitals) — Routine diagnostic services. <strong>Class D</strong> (Health Centres) — Basic laboratory services. <strong>Class E</strong> (Dispensaries/Clinics) — Limited point-of-care testing. BSc MLS graduates are trained to work, supervise, and teach in Class B laboratories and above." },
+  { q: "Explain the Cold Chain Management challenge in Kenyan laboratories and the corrective action required if a refrigerator reaches 10°C.", ans: "<strong>Cold Chain Challenge:</strong> Kenya's frequent power outages (load shedding) can disrupt the 2–8°C storage chain for temperature-sensitive reagents (e.g., HbA1c kits, enzyme reagents). Data loggers must be reviewed daily for temperature excursions. <br><strong>Corrective Action at 10°C:</strong> (1) Quarantine ALL reagents stored in the affected refrigerator. (2) Contact the manufacturer for guidance on stability at that temperature. (3) Run QC using a known control sample on a new lot to validate whether quarantined reagents are still usable. (4) Document the excursion, duration, and corrective actions taken. (5) Report to the laboratory manager." },
+  { q: "What vaccination requirements are mandated for medical laboratory personnel in Kenya, and why is Hepatitis B prioritized?", ans: "<strong>Required vaccines:</strong> Hepatitis B (3-dose series: 0, 1, 6 months — mandatory for all new lab staff); Tetanus (updated every 10 years); other vaccines per risk assessment (influenza, TB testing/BCG, etc.). BSL-3 staff require annual Chest X-ray (TB surveillance). <br><strong>Hepatitis B is prioritized</strong> because it is the single biggest occupational infectious threat to Kenyan laboratory personnel — the virus survives on surfaces for days, is present in blood/body fluids at very high concentrations, and has a much higher transmission rate per needlestick (6–30%) compared to HIV (<0.3%). A safe, effective vaccine exists — making non-vaccination professionally unacceptable." },
+  { q: "Explain the HAZOP approach to laboratory risk assessment and provide one example of a HAZOP question in a centrifuge scenario.", ans: "<strong>HAZOP (Hazard and Operability Study)</strong> is a systematic methodology (borrowed from chemical engineering) for identifying potential hazards by asking structured 'What if?' questions about each step of a process. It goes beyond simple hazard lists to evaluate the consequence of each deviation from normal operation. <br><strong>Centrifuge Example:</strong> 'What if the centrifuge rotor breaks during a high-speed run containing TB-positive sputum?' → Consequence: Aerosolization of infectious material throughout the laboratory → Mitigation: Use sealed, aerosol-tight rotor buckets; open centrifuge only inside a BSC; perform annual rotor integrity certification; have evacuation procedure if unexpected sounds occur." },
+  { q: "What is the FIRST-IN-FIRST-OUT (FIFO) principle in inventory management and why is it critical in a medical laboratory?", ans: "<strong>FIFO Principle:</strong> Items received first (oldest stock) are used first, ensuring nothing sits at the back of a shelf past its expiry date. <br><strong>Critical in medical labs because:</strong> (1) Expired reagents produce inaccurate results, potentially causing patient harm (missed diagnoses or false positives). (2) Kenya's laboratory budgets are limited — wasting expired reagents wastes scarce resources. (3) Regulatory compliance requires expiry date monitoring. (4) Reagent kits may have cold chain requirements making replacement costly. FIFO is implemented by physically placing new stock behind older stock and labeling shelves with 'USE THIS FIRST' indicators." },
+  { q: "Describe the key components of a Laboratory Information Management System (LIMS) and the implications of LIS failure.", ans: "<strong>Key LIMS components:</strong> Patient registration and test ordering; specimen tracking (from collection to result); result entry, validation, and verification; critical value flagging; QC tracking; report generation; inventory management; data archiving. <br><strong>LIS failure implications:</strong> (1) Loss of patient results and traceability. (2) Breakdown in critical value communication. (3) Patient misidentification risk during manual fallback. (4) Audit trail gaps (regulatory compliance violation under the Kenya Data Protection Act 2019). (5) Delayed turnaround times affecting clinical decisions. Labs must have written downtime procedures and data backup systems." },
+  { q: "What are the key components of a spill kit for managing a biological spill in a medical laboratory?", ans: "A biological spill kit must contain: (1) <strong>Appropriate disinfectant</strong> (e.g., 0.5% sodium hypochlorite for blood-borne pathogens); (2) <strong>Absorbent materials</strong> (paper towels, absorbent granules); (3) <strong>Full PPE</strong> — double gloves, impermeable gown, N95 mask or PAPR, eye protection; (4) <strong>Forceps and autoclavable scoop</strong> (never use bare hands to pick up broken glass); (5) <strong>Biohazard bags</strong> (yellow, for contaminated waste); (6) <strong>Sharps container</strong> (for glass fragments); (7) <strong>Written instructions</strong> (laminated response card). The kit must be accessible, fully stocked, and staff trained in its use at least annually." }
+];
+
+const longAnswers = [
+  { q: "A new pathogen (Mpox virus) has been identified in samples arriving at your BSL-2 laboratory at a county hospital in Kenya. Design a comprehensive biorisk assessment for this scenario, including hazard identification, risk quantification, hierarchy of controls, and recommended facility/procedure upgrades.", ans: "<strong>Biorisk Assessment for Mpox Virus in a Kenyan County Hospital BSL-2 Lab</strong><br><br><strong>1. Hazard Identification (Biological Characteristics):</strong> Mpox is a zoonotic orthopoxvirus with human-to-human transmission via direct contact, respiratory droplets, and potentially aerosols during procedures. Incubation 5–21 days. Can cause severe disease in immunocompromised individuals. Classification: BSL-2 agent for routine diagnostics (PCR), BSL-3 practices recommended for culture.<br><br><strong>2. Risk Quantification (Risk = Probability × Severity):</strong> Activities assessed: specimen receipt (moderate risk), processing (high), PCR setup (moderate), waste disposal (moderate). For specimen processing: Probability = High (frequent direct contact). Severity = Moderate-High (potentially serious disease, especially in immunocompromised staff). Overall risk: HIGH — requires enhanced controls.<br><br><strong>3. Hierarchy of Controls Applied:</strong> <em>Elimination/Substitution:</em> Route all suspected Mpox samples directly to KEMRI reference lab where possible; use inactivated specimens (heat or chemical inactivation before extraction) for molecular testing. <em>Engineering Controls:</em> Conduct all open-tube manipulation in a Class II BSC; use sealed centrifuge rotors; ensure negative pressure in the room or close doors during procedures. <em>Administrative Controls:</em> Develop and train all staff on Mpox-specific SOP within 48 hours; restrict sample handling to ≤2 trained staff; implement buddy system; update Emergency Response Plan. <em>PPE:</em> Double gloves; impermeable gown; N95 respirator (minimum) or PAPR; face shield; closed-toe shoes.<br><br><strong>4. Facility/Procedure Upgrades:</strong> Designate a specific processing area; validate room air exchanges post-procedure (30 min before access if aerosol-generating procedures occurred); install signage; establish dedicated waste stream; brief occupational health physician; ensure PEP protocols are updated; notify KEMRI and MOH as per Kenya Integrated Disease Surveillance and Response (IDSR) guidelines.<br><br><strong>5. Monitoring and Review:</strong> Daily incident log during Mpox sample handling period; weekly biosafety meeting; all staff exposed to samples monitored for 21 days post-exposure; review risk assessment if new WHO/MOH guidance is issued." },
+  { q: "You are the Laboratory Manager at a busy County Referral Hospital laboratory in Kenya. Design a comprehensive Quality Management System (QMS) for your clinical chemistry section, incorporating Sigma metrics, Westgard rules, EQA participation, and corrective action processes. Provide specific examples relevant to a glucose analyzer.", ans: "<strong>Comprehensive QMS for Clinical Chemistry — Glucose Analyzer</strong><br><br><strong>1. Method Validation (Before Implementation):</strong> Determine the Sigma metric: TEa for glucose = ±10% (CLIA). Run precision study (20 samples at 2 concentrations over 5 days) to calculate CV% (random error). Run comparison with reference method to calculate Bias%. Calculate: σ = (10% − Bias%) / CV%. A σ ≥ 6 = accept; 3–6 = use multi-rules; <3 = method unacceptable.<br><br><strong>2. Daily Internal QC Protocol:</strong> For σ ≥ 6: Run single QC level, apply 1₃s warning rule. For σ 4–6 (typical for medium-resource Kenyan labs): Run 2 QC levels, apply Westgard 1₂s/2₂s/R₄s/4₁s/10x multi-rules. Create Levey-Jennings charts with ±2SD and ±3SD limits. QC before the first patient sample each session. Document all out-of-control events.<br><br><strong>3. External Quality Assessment (EQA):</strong> Enroll in a recognized scheme (e.g., KEMRI EQA program, RCPAQAP, or RIQAS). Receive blinded samples every 2 months. Report results per scheme requirements. Review performance reports — investigate any bias >2 SD from peer group mean. EQA failures trigger Root Cause Analysis (RCA).<br><br><strong>4. Corrective Action Process (for Out-of-Control Event):</strong> Step 1: Do not release patient results. Step 2: Identify the error type — is it random (R₄s rule violated → likely mixing issue or reagent problem) or systematic (10x or 2₂s → likely calibration drift or reagent lot issue)? Step 3: Check most recent calibration, reagent lot, QC material integrity, analyzer maintenance log. Step 4: Recalibrate → repeat QC. If passes: release results and document. Step 5: If recalibration fails: remove reagent lot, contact manufacturer, use backup method. Step 6: Complete CAPA (Corrective and Preventive Action) form. Step 7: Review at monthly QC meeting.<br><br><strong>5. Moving Average Monitoring:</strong> Plot daily patient mean glucose. If population mean shifts significantly (e.g., from 7.1 to 8.9 mmol/L across a week without epidemiological reason), investigate analyzer drift — even if formal QC samples did not flag an error.<br><br><strong>6. Management Review:</strong> Monthly QC summary presented to Lab Director. Annual review of Sigma metrics, EQA performance trends, corrective action effectiveness. Findings drive procurement decisions (e.g., replacing an analyzer with chronic σ < 3)." },
+  { q: "Discuss the design and implementation of a comprehensive Occupational Health and Safety Program for a medical laboratory in Kenya, covering vaccination policies, health surveillance, sharps injury management, chemical safety, and the roles and responsibilities of laboratory management versus individual staff members.", ans: "<strong>Comprehensive Occupational Health & Safety (OHS) Program for a Kenyan Medical Laboratory</strong><br><br><strong>1. Program Governance:</strong> The Laboratory Manager is legally responsible (under Kenya's Occupational Safety and Health Act) for providing a safe working environment. An OHS Committee (Lab Manager + senior techs + a worker representative) meets quarterly. An OHS Manual is maintained and reviewed annually.<br><br><strong>2. Pre-Employment Health Assessment:</strong> Medical history and physical exam before starting work. Baseline HIV test (voluntary, with counseling). Chest X-ray (baseline, especially for staff assigned to TB testing). Blood pressure, vaccination history review. Any contraindication to certain work (e.g., immunosuppression → restricted from BSL-3 work) documented with HR.<br><br><strong>3. Vaccination Program:</strong> <em>Mandatory for all:</em> Hepatitis B (3-dose series at 0, 1, 6 months) — anti-HBs titer checked 1–2 months after 3rd dose to confirm seroconversion (>10 mIU/mL = protected). Non-responders (titer <10 mIU/mL) receive a repeat 3-dose series. Tetanus toxoid (every 10 years). <em>Recommended:</em> Annual influenza vaccine. BSL-3 staff: PPD/IGRA testing annually for TB surveillance. <em>Mandatory records:</em> Vaccination register with dates and batch numbers.<br><br><strong>4. Ongoing Health Surveillance:</strong> Annual occupational medical review for all staff. Chest X-ray annually for BSL-3 and histology staff. Spirometry for staff using volatile chemicals (formaldehyde, xylene). Confidential post-exposure follow-up records maintained separately from HR files. Pregnancy risk assessment — pregnant staff reassigned away from BSL-3, radiological, and high-chemical-exposure work.<br><br><strong>5. Sharps Injury Management Protocol:</strong> Immediate: wash with soap and water, allow bleeding, apply antiseptic, cover. Report to supervisor within 1 hour. Formal incident report within 24 hours. Medical evaluation: assess source patient's HIV/HBV status (with consent). Start PEP within 2 hours if HIV risk (TLD regimen, 28-day course). HIV baseline test on injured staff. Follow-up testing at 6 weeks, 3 months, 6 months. Prevention: no recapping policy (enforced by annual audit), safety-engineered devices where budget allows, sharps containers at point of use (never filled >3/4).<br><br><strong>6. Chemical Safety Elements:</strong> Updated Chemical Hygiene Plan (CHP) reviewed annually. SDS available (in binder AND digital) for all chemicals. Fume hood certification every 6 months (for xylene/formaldehyde labs). Annual chemical inventory — dispose of chemicals within 1 year of opening or per SDS guidance. Staff trained on GHS labeling system.<br><br><strong>7. Management vs. Staff Responsibilities:</strong> <em>Management:</em> Provide functional PPE, spill kits, PEP starter packs, vaccination program, and emergency equipment. Conduct risk assessments and update SOPs. Investigate all incidents within 72 hours. Report occupational injuries to DOSH (Directorate of Occupational Safety and Health) as required. <em>Individual Staff:</em> Wear appropriate PPE at all times. Report injuries, spills, and near misses immediately. Attend all mandatory safety training. Follow all SOPs without shortcuts. Maintain personal health records." },
+  { q: "A large volume of diverse laboratory waste is generated daily at a Kenyan county referral hospital. Design a comprehensive Medical Waste Management Plan covering waste classification, segregation at source, safe transport within the facility, treatment methods, and disposal, with reference to NEMA and WHO guidelines.", ans: "<strong>Medical Waste Management Plan — County Referral Hospital Laboratory, Kenya</strong><br><br><strong>1. Regulatory Framework:</strong> Kenya's National Environment Management Authority (NEMA) regulates biomedical waste disposal under the Environmental Management and Co-ordination Act. WHO Guidelines for Safe Management of Wastes from Health-Care Activities (2014, 'Blue Book') provide international standards. The laboratory QMS must document waste management as a formal procedure.<br><br><strong>2. Waste Classification &amp; Segregation at Source:</strong> <em>Infectious waste (yellow bags/containers):</em> Used specimen containers, cultures, contaminated swabs, soiled PPE. Treatment: Autoclave or incinerate. <em>Sharps waste (yellow puncture-proof sharps containers, UN-approved):</em> Needles, scalpels, lancets, broken glass, capillary tubes. Treatment: Incinerate; never autoclave needles. <em>Chemical waste (brown/orange, labeled by hazard class):</em> Expired reagents, solvents, fixatives (xylene, formalin), heavy metals. Treatment: Licensed chemical waste disposal company (NEMA registered). NEVER pour down drain. <em>Pharmaceutical waste (blue):</em> Expired reagents/kits. <em>General (non-hazardous) waste (black/green):</em> Paper, uncontaminated packaging. <em>Radioactive waste (where applicable):</em> Handled by authorized facility only.<br><br><strong>3. Segregation Principle:</strong> Waste is segregated at the point of generation — each bench must have: one yellow waste bin (infectious), one sharps container, and one general waste bin. Cross-contamination of waste streams (e.g., putting a bloody glove in general waste) is a disciplinary offense. Train all staff including cleaning staff on proper segregation.<br><br><strong>4. Internal Transport:</strong> Use dedicated, color-coded rigid trolleys for waste transport — never mix infectious and general waste trolleys. Transport only in sealed bags/containers. Designate specific waste transport routes (ideally not through patient areas). Transport at designated times (e.g., early morning, late evening) to avoid contact with visitors/patients. Staff transporting infectious waste must wear PPE (gloves, apron, closed shoes).<br><br><strong>5. Treatment Methods:</strong> <em>Autoclaving:</em> For infectious waste, blood samples, agar plates. Validate cycle with biological indicators (Geobacillus stearothermophilus strips). Record each cycle in the autoclave log (load description, temperature, pressure, time, indicator result). <em>Incineration:</em> For sharps, pathological waste, infectious waste when autoclave is unavailable. Use a dual-chamber incinerator (>800°C primary, >1100°C secondary chamber) to prevent dioxin release. Keep incineration records. <em>Chemical disinfection:</em> For liquid infectious waste (pour 1:10 bleach solution, wait 30 min) before drain disposal where permitted by NEMA.<br><br><strong>6. Final Disposal:</strong> Autoclaved waste → municipal solid waste landfill. Ash from incineration → designated facility waste pit or licensed landfill. Chemical waste → collected by NEMA-licensed disposal company quarterly (maintain manifest). Sharps → incineration only (never buried unshredded).<br><br><strong>7. Documentation and Audit:</strong> Monthly waste log (weights by category). Annual NEMA compliance audit. Internal waste management audit every 6 months. Training records for all staff. Corrective action register for any segregation non-compliance." },
+  { q: "As Laboratory Director at a new county hospital in Western Kenya, develop a comprehensive Laboratory Policy Framework document outline, covering all essential policy areas required for ISO 15189:2022 compliance, explaining the purpose and key content of each policy area.", ans: "<strong>Laboratory Policy Framework — ISO 15189:2022 Compliance</strong><br><strong>County Hospital, Western Kenya</strong><br><br><strong>1. Quality Policy:</strong> Purpose: Defines the laboratory's commitment to quality. Content: Mission statement of the lab; commitment to accuracy, timeliness, and patient safety; statement that quality is everyone's responsibility; policy reviewed annually and signed by Lab Director; displayed publicly in the lab.<br><br><strong>2. Scope of Services Policy:</strong> Lists all tests performed; defines laboratory classification (Class B); reference laboratory linkages (e.g., KEMRI for exotic pathogens); turnaround time commitments per test category; after-hours testing arrangements.<br><br><strong>3. Document and Records Control Policy:</strong> Defines document hierarchy (Quality Manual → SOPs → Forms); version control procedures; document approval workflow (authored → reviewed → approved by Lab Director); Master List of all controlled documents; retention period per record type (patient records: 7 years per Kenya Health Act); destruction procedures.<br><br><strong>4. Personnel Policy:</strong> Minimum qualifications for each lab role (e.g., Section Head must be Registered Medical Laboratory Technologist); KMLTTB licensing requirement for all clinical staff; annual competency assessment requirements; CPD hours required per year; disciplinary procedures; job descriptions for all positions; training and orientation plan for new hires.<br><br><strong>5. Biosafety and Biosecurity Policy:</strong> Risk-based biosafety framework (Hierarchy of Controls); PPE requirements by risk zone; vaccination requirements (Hepatitis B mandatory); incident reporting obligations; access control to restricted areas; biological material inventory and security; external visitor escort policy.<br><br><strong>6. Specimen Management Policy:</strong> Acceptable specimen types and rejection criteria; collection SOPs for all specimen types; transport conditions (temperature, time limits); labeling requirements; chain of custody; storage conditions and duration; disposal procedure.<br><br><strong>7. Quality Control and Assurance Policy:</strong> Frequency of QC testing per instrument type; EQA program participation (minimum 2 schemes); Sigma metric evaluation at method implementation and annually; corrective action requirements for out-of-control events; turnaround time monitoring; customer complaint handling.<br><br><strong>8. Equipment Management Policy:</strong> Equipment register; calibration schedule per instrument; preventive maintenance schedule; certification requirements (BSC annual HEPA/airflow certification; autoclave quarterly validation); equipment failure reporting; vendor qualification.<br><br><strong>9. Health, Safety, and Occupational Health Policy:</strong> Zero-tolerance for PPE non-compliance; sharps safety policy (no recapping); PEP availability and 24/7 access procedure; pregnancy risk assessment policy; chemical hygiene plan; fire safety; emergency evacuation drills (minimum twice yearly).<br><br><strong>10. Waste Management Policy:</strong> Classification and segregation standards (aligned with NEMA and WHO); treatment methods per waste category; external disposal vendor requirement (NEMA licensed); waste manifest documentation; staff training requirement.<br><br><strong>11. Confidentiality and Information Security Policy:</strong> Patient data classified as sensitive personal data (Kenya Data Protection Act 2019); LIS access levels (view only / data entry / validation / administration); audit trail requirements; breach response procedure; prohibition on sharing results via unencrypted personal phones/WhatsApp.<br><br><strong>12. Ethics and Professional Conduct Policy:</strong> Conflicts of interest declaration; gifts policy; non-discrimination in service delivery; reference to KMLTTB Code of Professional Conduct; obligation to report unethical practices through defined whistleblowing channel.<br><br><strong>ISO 15189:2022 Compliance Note:</strong> All policies must be reviewed at minimum annually. Evidence of policy awareness (staff signatures) must be maintained. Internal audits must verify adherence to each policy area at least once per year. Management review must address policy effectiveness." },
+  { q: "Discuss the role of the pre-analytical phase in ensuring laboratory quality. What are the five most common pre-analytical errors in a busy Kenyan hospital laboratory, what are their consequences for patient care, and what systematic interventions would you implement as laboratory manager to prevent them?", ans: "<strong>Pre-analytical Phase and Quality in Kenyan Hospital Laboratories</strong><br><br><strong>Introduction:</strong> The pre-analytical phase encompasses all steps from test ordering to specimen arrival at the analyst's bench: test requisition, patient identification, patient preparation, specimen collection, labeling, transport, receipt, and processing. Research consistently shows this phase accounts for up to 70% of all laboratory errors — and in Kenyan hospitals with high patient volumes, understaffed wards, and manual processes, this figure may be even higher.<br><br><strong>Top 5 Pre-analytical Errors and Consequences:</strong><br><br><strong>1. Patient Misidentification:</strong> Wrong-patient samples or mislabeled tubes. Consequence: Results attributed to wrong patient → wrong diagnosis, wrong drug doses, potentially fatal outcomes (e.g., transfusion of wrong blood type). Intervention: Enforce two-identifier policy (full name + date of birth or unique hospital number) at both collection AND reception; barcode patient wristbands where available; LIS cross-check at specimen receipt.<br><br><strong>2. Incorrect Order of Draw:</strong> Drawing EDTA before citrate contaminates coagulation tests with potassium, causing falsely prolonged APTT — leading to unnecessary anticoagulant dose adjustments. Intervention: Laminated Order of Draw poster at every phlebotomy station; include in annual competency assessment; have supervisor audit 10% of draws monthly.<br><br><strong>3. Hemolysis (In Vitro):</strong> Caused by using needles with too-large vacuums, prolonged tourniquet time (>1 min), vigorous shaking of tubes, or delayed separation. Interferes with potassium, LDH, AST, and bilirubin assays. Consequence: Falsely elevated potassium can trigger unnecessary cardiac monitoring or medication. Intervention: Train on correct phlebotomy technique; implement Hemolysis Index reporting ('Specimen hemolyzed — result may be unreliable, recollection advised'); track hemolysis rejection rates monthly as a KPI.<br><br><strong>4. Insufficient Volume / Underfilling Tubes:</strong> Underfilled citrate (blue) tubes change the blood:anticoagulant ratio, falsely prolonging PT and APTT. Critical for coagulation testing in patients on warfarin. Intervention: Train phlebotomists to fill to tube mark; reject and recollect all underfilled blue-top tubes; document rejection reasons in LIS for trending.<br><br><strong>5. Delayed Specimen Transport or Improper Temperature:</strong> Blood glucose degrades by ~10 mg/dL/hour at room temperature in unseparated serum. Haematology samples left at room temperature >4 hours show WBC morphology changes. In Kenyan hospitals where samples travel long distances on motorcycles or matatus, temperature and time excursions are common. Intervention: Use fluoride-oxalate tubes for glucose if processing delayed; implement maximum transport time policy (serum separated within 2 hours); track specimen age at receipt; provide cooler boxes for regional sample transport.<br><br><strong>Systemic Management Interventions:</strong> Monthly pre-analytical KPI dashboard (hemolysis rate, rejection rate by reason, by collector ID); anonymous feedback to ward phlebotomists; quarterly competency retraining; engagement with nursing department for shared responsibility; use of pre-analytical checklist at specimen receipt; root cause analysis for all critical value errors traced to pre-analytical failures." },
+  { q: "Critically discuss the implementation of an effective Biosafety Training Program for new laboratory personnel at a Kenyan referral hospital, incorporating the Kirkpatrick Four-Level Evaluation Model, competency assessment tools, and a schedule for ongoing refresher training.", ans: "<strong>Biosafety Training Program — Kenyan Referral Hospital Laboratory</strong><br><br><strong>Rationale:</strong> Training without evaluation is assumption. A competency-based biosafety training program uses the Kirkpatrick Four-Level Model to ensure training actually changes behavior and reduces incident rates — not just fills attendance registers.<br><br><strong>Phase 1: Needs Assessment (Pre-Training):</strong> Analyze incident reports from the past 12 months to identify most common unsafe behaviors (e.g., PPE non-compliance, unsafe sharps disposal). Map required competencies for each role (phlebotomist, clinical chemist, microbiologist, histotechnologist) against current knowledge gaps. Survey new staff with a validated Biosafety Knowledge, Attitudes, and Practices (KAP) questionnaire.<br><br><strong>Phase 2: Training Design and Delivery (Week 1–2 for New Staff):</strong> Day 1: Orientation — Laboratory biosafety policy, Kenya regulatory framework (KMLTTB, KEMRI, Biosafety Act), hierarchy of controls. Day 2: Hands-on PPE donning/doffing (demonstrated, then observed). Day 3: BSC operation, aerosol-generating procedures. Day 4: Waste management, spill kit use (practical exercise with a simulated spill using colored water). Day 5: Emergency procedures — fire drill, evacuation routes, PEP kit location and use. Day 6: Sharps safety (practical on safe disposal, needle injury first aid simulation). Day 7: Written examination + practical assessment.<br><br><strong>Kirkpatrick Level 1 — Reaction:</strong> Post-training feedback form: Was training relevant? Was facilitator effective? Rating scale 1–5. Results reviewed by training coordinator. Minimum acceptable score: 3.5/5 average. Low scores trigger training revision.<br><br><strong>Kirkpatrick Level 2 — Learning:</strong> Written test (minimum pass mark: 75%) on biosafety principles, PPE selection, waste classification, spill management. Practical assessment: observed donning/doffing of full PPE (scored on 10-point checklist). Staff who fail retrain and retest within 1 week. No clinical work until passing.<br><br><strong>Kirkpatrick Level 3 — Behavior:</strong> Supervisor observation at 1 month and 3 months: Does the staff member consistently wear correct PPE? Correctly dispose of sharps? Follow spill procedures? Use standardized observation checklist. Findings documented in personnel file. Consistent non-compliance triggers a counseling session (Just Culture model: coach if at-risk behavior).<br><br><strong>Kirkpatrick Level 4 — Results:</strong> Track lab-wide incident rate per 1000 hours worked. Compare 6-month post-training data to pre-training baseline. Target: 30% reduction in PPE-related incidents within 12 months. Report results to Lab Director and Hospital Safety Committee annually.<br><br><strong>Ongoing Refresher Schedule:</strong> Quarterly: 30-min safety brief (rotating topics: spill management, PEP, cold chain). Annually: Full biosafety refresher day (required for all staff). Immediately: Ad hoc retraining after any biosafety incident. After any SOP update: briefing and signed acknowledgment within 2 weeks. BSL-3 staff: additional refresher every 6 months with documented record.<br><br><strong>Training Records:</strong> Individual training matrix per staff member (updated in real time in LIS or HR system). Required for ISO 15189:2022 compliance. Retained for duration of employment + 5 years." },
+  { q: "You have been appointed to set up a new BSL-3 mycobacteriology laboratory at a county referral hospital in Western Kenya. Describe the facility design requirements, engineering controls, operational procedures, and staff qualifications needed, with reference to WHO and Kenyan regulatory guidelines.", ans: "<strong>BSL-3 Mycobacteriology Laboratory Setup — Western Kenya County Hospital</strong><br><br><strong>Regulatory Framework:</strong> WHO Laboratory Biosafety Manual (4th Ed, 2020) — guidelines for BSL-3 facilities. Kenya Laboratory Biorisk Management Curriculum (2nd Ed, 2019) — national competency framework. Kenya Biosafety and Biosecurity Policy Guidelines (2014) — approval requirements. NEMA — environmental compliance. Facility must be approved by the relevant MOH Biosafety Authority before becoming operational.<br><br><strong>1. Facility Design Requirements:</strong> <em>Location:</em> Isolated from general lab traffic, ideally in a separate wing or floor. <em>Entry:</em> Double-door airlock/anteroom between corridor and lab proper. Both doors should never open simultaneously (interlock or protocol). <em>Surfaces:</em> Walls, floors, and ceilings must be smooth, impermeable, and easily decontaminated. No cracks, crevices, or unsealed service penetrations. Surfaces resistant to disinfectants used (bleach, aldehyde). <em>Windows:</em> No opening windows. If present, sealed and break-resistant. <em>Sinks:</em> Hands-free (foot/elbow/sensor-operated) sink at exit of anteroom. <em>Pass-through autoclave:</em> Double-ended autoclave installed in the wall between the dirty lab and a 'clean' disposal area — mandatory for BSL-3. <em>Emergency shower and eyewash:</em> Within 10 seconds of workstations.<br><br><strong>2. Engineering Controls (HVAC):</strong> <em>Negative pressure:</em> Lab maintained at -50 Pa or more negative than adjacent corridor (verified by manometer). Audible/visual alarm if pressure is lost. <em>Air changes:</em> Minimum 12 air changes per hour (20 preferred for mycobacteriology). <em>100% exhaust:</em> Air is NOT recirculated — all exhaust passes through HEPA filtration before leaving the building. HEPA filters certified annually. <em>Directional airflow:</em> Clean corridor → anteroom → lab (always inward). <em>BSC placement:</em> Class II Type B2 BSC preferred for TB (100% exhaust BSC); alternatively Class II Type A2 with exhaust ducted outside. Certified every 6 months (airflow, HEPA integrity, cabinet negative pressure). <em>UV lights:</em> In anteroom and waste handling area (surface decontamination overnight).<br><br><strong>3. Operational Procedures:</strong> Access restricted to approved BSL-3-trained staff only — key/biometric entry. Two-person buddy system for all work sessions. No lone working. Full PPE at all times: N95 minimum (PAPR preferred), double gloves, impermeable gown, face shield. All aerosol-generating procedures (centrifugation, sonication, loop inoculation) performed in BSC. Sealed, aerosol-tight centrifuge rotors mandatory. Pressure alarm monitoring daily before work begins. SOP for decontaminating BSC before and after each use (10,000 ppm bleach, 10 min contact, followed by 70% IPA wipe). Waste: all infectious waste autoclaved via pass-through autoclave before leaving the lab. No specimens or cultures leave BSL-3 area without proper inactivation or Category A packaging. Decontamination of room quarterly with formaldehyde fumigation or VHP (vapor-phase hydrogen peroxide) generators.<br><br><strong>4. Staff Requirements:</strong> Minimum qualification: Registered Medical Laboratory Technologist with postgraduate training or documented experience in mycobacteriology/BSL-3 work. Completed KEMRI/WHO BSL-3 training course. Annual chest X-ray (TB surveillance). Annual IGRA or Mantoux test. Hepatitis B vaccinated and confirmed seroconverted. Psychological fitness assessment (some staff experience anxiety in BSL-3 — documented voluntary consent required). Annual BSL-3 competency certification (renewed every year).<br><br><strong>5. Documentation and Oversight:</strong> Lab Access Register (all entries/exits logged with time). Culture/specimen inventory (biannual reconciliation). Maintenance log for BSC, HVAC, and autoclave. Incident log. MOH annual inspection. KENAS certification required for test result reporting." },
+  { q: "Discuss the concept of 'Total Laboratory Management' as applied to a medical laboratory in Kenya, covering the management of human resources, physical resources (equipment and reagents), information management, and quality, showing how all these components are interconnected in delivering accurate and timely diagnostic services.", ans: "<strong>Total Laboratory Management (TLM) in Kenyan Medical Laboratories</strong><br><br><strong>Introduction:</strong> Total Laboratory Management is a systems-thinking approach that views the laboratory not as a collection of tests, but as an integrated enterprise delivering a diagnostic service. In Kenya, where laboratories operate within devolved county health systems under pressure from high disease burdens (TB, HIV, malaria, NCDs), resource constraints, and increasing ISO 15189 accreditation demands, TLM provides the framework for sustainable, high-quality diagnostic services.<br><br><strong>1. Human Resource Management:</strong> The laboratory's greatest asset and greatest risk is its people. TLM requires: <em>Competency-based recruitment</em> — matching KMLTTB-registered personnel to roles using competency matrices. <em>Motivation and retention</em> — addressing the 'brain drain' challenge in Kenyan county labs through structured CPD, mentorship programs (linking county labs to teaching hospitals like Maseno/Masinde Muliro University), and career progression pathways. <em>Leadership development</em> — identifying and grooming future lab managers through internal leadership training. <em>Just Culture implementation</em> — creating a psychological safety environment where errors are reported (not hidden), enabling learning and system improvement. <em>Workforce planning</em> — using test volume data from the LIS to predict staffing needs for shift patterns, surge periods (e.g., malaria season), and new service expansion. Connection to quality: Competent, motivated staff produce fewer pre-analytical errors, maintain better QC compliance, and respond more effectively to incidents.<br><br><strong>2. Physical Resource Management (Equipment & Reagents):</strong> <em>Equipment lifecycle management:</em> From procurement (KEBS-approved vendors, standardized tender process as per Public Procurement and Asset Disposal Act) through installation, commissioning, daily use, calibration, preventive maintenance, repair, and decommissioning. Equipment availability (uptime) is a core KPI — target >95% uptime for critical analyzers. <em>Reagent supply chain:</em> ABC analysis to prioritize high-value reagents; safety stock calculations to buffer against Mombasa port lead times (4–6 weeks); cold chain management with data loggers; FIFO to prevent expiry waste. Connection to quality: A well-maintained, calibrated analyzer running in-date, cold-chain-intact reagents is the foundation of analytical phase accuracy. Without this, even the best QC protocol cannot deliver reliable results.<br><br><strong>3. Information Management:</strong> The Laboratory Information System (LIS) is the central nervous system of TLM. It connects all phases: pre-analytical (test ordering, patient ID, specimen tracking), analytical (QC integration, result validation), and post-analytical (reporting, critical value alerting, data archiving). Key TLM applications: Real-time workload monitoring — identify bottlenecks (e.g., serology section backlog at 14:00). Turnaround time (TAT) tracking per test — target <4 hours for routine chemistry, <1 hour for critical values. Inventory integration — automatic reorder triggers when stock falls below minimum. Dashboard reporting — monthly statistics to hospital management (volume, TAT performance, QC failures, rejection rates). Kenya Data Protection Act 2019 compliance — audit trails, access control, encrypted transmission. Connection to all management areas: The LIS links HR (workload per staff), equipment (downtime tracking), reagents (consumption data), and quality (QC records, EQA results).<br><br><strong>4. Quality Management (The Integrating Framework):</strong> Quality Management does not sit separately — it is the governance framework within which all TLM components operate. ISO 15189:2022 provides the structure: Quality Manual → Policies → SOPs → Records. Internal audits verify that HR is competent (Level 3 Kirkpatrick), equipment is maintained (calibration records), information is secure (LIS audit log), and tests are accurate (QC Sigma metrics, EQA). Management Review — the Lab Director reviews all TLM components quarterly: incident rates, QC performance, EQA results, staff competency assessment, equipment uptime, reagent stockouts. This ensures quality is not an afterthought but the operating standard.<br><br><strong>5. The Interconnection — A Systems View:</strong> Imagine the following failure chain: A reagent cold-chain breach (Resource Management failure) leads to a falsely elevated HbA1c result (Analytical failure). The LIS does not flag this because the QC was performed before the temperature excursion was noticed (Information Management / QC gap). A patient is incorrectly classified as diabetic and prescribed metformin (Clinical harm). Under TLM, each of these failures is tracked: the temperature excursion is in the data logger → the QC record shows the event timeline → the incident report triggers CAPA → the corrective action updates the cold-chain SOP and adds an automatic LIS flag when temperature excursions are logged. This is TLM in action: all components are monitored, interconnected, and continuously improved.<br><br><strong>Conclusion:</strong> In the Kenyan healthcare context, TLM is not a luxury — it is the minimum standard required to deliver ISO 15189-compliant, patient-safe diagnostic services. The Lab Manager's role is to be the architect, monitor, and continuous improver of this integrated system." },
+  { q: "A medical laboratory in Kenya has reported three needlestick injuries in one month among junior phlebotomists. As Laboratory Manager, conduct a formal Root Cause Analysis (RCA) using the '5 Whys' and Fishbone (Ishikawa) Diagram approach, propose systemic corrective actions, and design a monitoring plan to evaluate their effectiveness.", ans: "<strong>Root Cause Analysis (RCA): Recurring Needlestick Injuries — Kenyan Hospital Laboratory</strong><br><br><strong>Step 1: Immediate Response (Before RCA):</strong> Ensure all three injured staff received immediate first aid, PEP assessment, and incident documentation. Quarantine the affected phlebotomy workflow pending investigation. Inform the hospital occupational health physician. Brief all lab staff on the cluster without blame (Just Culture).<br><br><strong>Step 2: 5 Whys Analysis (Applied to Most Common Scenario — Recapping Injury):</strong><br>WHY 1: Why did the phlebotomist sustain a needlestick? → Because they were recapping the needle after blood collection.<br>WHY 2: Why were they recapping? → Because there was no sharps container at the phlebotomy station — the nearest one was in the corridor.<br>WHY 3: Why was there no sharps container at the station? → Because the sharps containers had not been replaced after filling — they were full and there was no replacement stock available.<br>WHY 4: Why was replacement stock unavailable? → Because the procurement system requires a 3-week approval cycle and nobody had initiated a reorder before stock ran out.<br>WHY 5: Why was there no reorder trigger? → Because there is no defined minimum stock level or responsible person for sharps container inventory — the procedure relies entirely on individual initiative.<br><strong>Root Cause identified:</strong> Absence of a formal minimum stock policy and defined inventory accountability for sharps containers at the point of use.<br><br><strong>Step 3: Fishbone (Ishikawa) Diagram Categories:</strong><br><em>Man (People):</em> Junior phlebotomists not re-trained on no-recapping policy since orientation; culture of accepting unsafe workarounds (high workload → 'just this once').<br><em>Method (Procedures):</em> No-recapping SOP exists but not enforced; no auditing process; no consequence for non-compliance.<br><em>Machine/Materials:</em> No safety-engineered needles (retractable); sharps containers not at point-of-use; containers allowed to overfill (>3/4 full).<br><em>Management:</em> No minimum stock policy for sharps containers; no designated inventory owner; no sharps injury trend analysis in last 6 months; inadequate supervision of junior phlebotomists.<br><em>Measurement:</em> Sharps injury rate was not being tracked as a KPI; no monthly safety dashboard; previous incidents not shared in team meetings (blame culture).<br><em>Environment:</em> Busy phlebotomy area with high patient volume; insufficient bench space for sharps container positioning; dim lighting in mobile phlebotomy area.<br><br><strong>Step 4: Systemic Corrective Actions (CAPA):</strong><br>1. <em>Engineering:</em> Place a sharps container at every phlebotomy station (not shared, not in corridor). Evaluate cost-effectiveness of safety-engineered retractable needles — apply for KEMRI/MOH Safety Engineering fund. Standard: containers replaced at 3/4 full, not when full.<br>2. <em>Administrative:</em> Set minimum stock for sharps containers = 2 weeks supply; designate a named 'Inventory Officer' for safety consumables; add sharps container stock to weekly inventory check. Update SOP to include 'no sharps container at station = do not begin phlebotomy.'<br>3. <em>Training:</em> Within 5 days: mandatory 30-minute all-staff safety brief covering the RCA findings (anonymized) and the corrective actions — sign-off required. Annual competency assessment to include sharps safety practical observation.<br>4. <em>Culture:</em> Introduce monthly 'near-miss reporting' with a non-punitive near-miss register. Share anonymized sharps injury data at monthly staff meetings to normalize safety conversation.<br>5. <em>Supervision:</em> Phlebotomy supervisors to conduct direct observation spot-checks on 10% of phlebotomy sessions weekly for the next 3 months.<br><br><strong>Step 5: Monitoring Plan (Evaluating Effectiveness):</strong><br>KPI 1: Sharps injury rate (per 1,000 phlebotomy procedures) — measured monthly. Target: 50% reduction within 3 months; zero recapping-related injuries within 6 months.<br>KPI 2: Sharps container compliance audit (proportion of stations with compliant, un-overfilled container at point of use) — weekly audit for first month, then monthly. Target: 100%.<br>KPI 3: No-recapping compliance — direct observation by supervisor, 10% of sessions. Target: 100% compliance at 3 months.<br>KPI 4: Near-miss reports submitted — track monthly. Increasing near-miss reports initially = positive (staff now reporting). Decrease in actual injuries = effectiveness confirmed.<br><br><strong>Report:</strong> RCA findings, corrective actions, and monitoring results presented to Lab Director, Hospital Safety Committee, and DOSH (Directorate of Occupational Safety & Health) within 30 days of incident cluster. Follow-up report at 3 months and 6 months to confirm sustained improvement or escalate to DOSH if corrective actions have failed." }
+];
+
+// Build MCQ
+function buildMCQ() {
+  const container = document.getElementById('mcq-section');
+  mcqs.forEach((mcq, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.innerHTML = `
+      <div class="q-num">Question ${i+1} of 50</div>
+      <div class="q-text">${mcq.q}</div>
+      <div class="options" id="opts-${i}">
+        ${mcq.opts.map((opt, j) => `
+          <label class="option" id="opt-${i}-${j}" onclick="selectOpt(${i},${j})">
+            <input type="radio" name="q${i}" value="${j}">
+            <span class="opt-dot">${String.fromCharCode(65+j)}</span>
+            <span class="opt-label">${opt}</span>
+          </label>
+        `).join('')}
+      </div>
+      <div class="feedback" id="fb-${i}"></div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+let selected = {};
+function selectOpt(qi, oi) {
+  if (selected[qi] !== undefined) return; // locked
+  selected[qi] = oi;
+  document.querySelectorAll(`#opts-${qi} .option`).forEach(el => el.classList.remove('selected'));
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = 80;
+  const answered = Object.keys(selected).length + document.querySelectorAll('.short-answer textarea').length + document.querySelectorAll('.long-answer textarea').length;
+  const mcqAnswered = Object.keys(selected).length;
+  document.getElementById('answered-count').textContent = mcqAnswered;
+  const pct = Math.round((mcqAnswered / total) * 100);
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function submitMCQ() {
+  let correct = 0;
+  mcqs.forEach((mcq, i) => {
+    const userAns = selected[i];
+    const fb = document.getElementById(`fb-${i}`);
+    document.querySelectorAll(`#opts-${i} .option`).forEach((el, j) => {
+      el.onclick = null;
+      if (j === mcq.ans) el.classList.add('correct');
+      if (userAns !== undefined && j === userAns && j !== mcq.ans) el.classList.add('wrong');
+    });
+    if (userAns === mcq.ans) {
+      correct++;
+      fb.className = 'feedback correct show';
+      fb.innerHTML = `✓ Correct! ${mcq.exp}`;
+    } else {
+      fb.className = 'feedback wrong show';
+      fb.innerHTML = `✗ ${userAns !== undefined ? 'Incorrect.' : 'Not answered.'} The correct answer is <strong>${String.fromCharCode(65 + mcq.ans)}: ${mcq.opts[mcq.ans]}</strong>. ${mcq.exp}`;
+    }
+  });
+  const pct = Math.round((correct / 50) * 100);
+  document.getElementById('mcq-score').textContent = `${correct}/50`;
+  const banner = document.getElementById('result-banner');
+  banner.classList.add('show');
+  document.getElementById('final-score').textContent = pct + '%';
+  let grade, msg;
+  if (pct >= 70) { grade = 'PASS — ' + (pct >= 90 ? 'Distinction' : pct >= 80 ? 'Credit' : 'Pass'); msg = 'Excellent work! You have a strong command of Medical Laboratory Management & Biosafety.'; }
+  else { grade = 'FAIL — Below 70%'; msg = 'Review the highlighted sections and attempt again. Focus on areas where you selected incorrect answers.'; }
+  document.getElementById('final-grade').textContent = grade;
+  document.getElementById('final-msg').textContent = `${correct} out of 50 MCQs correct. ${msg}`;
+  banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Build Short Answer
+function buildShort() {
+  const container = document.getElementById('short-section');
+  shortAnswers.forEach((sa, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.innerHTML = `
+      <div class="q-num">Short Answer Question ${i+1} of 20</div>
+      <div class="q-text">${sa.q}</div>
+      <div class="short-answer">
+        <textarea placeholder="Write your answer here (aim for 4–8 sentences)..." id="sa-${i}"></textarea>
+        <button class="reveal-btn" onclick="revealSA(${i}, this)">▶ Reveal Model Answer</button>
+        <div class="model-answer" id="sa-ans-${i}">${sa.ans}</div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function revealSA(i, btn) {
+  const ans = document.getElementById(`sa-ans-${i}`);
+  ans.classList.toggle('show');
+  btn.textContent = ans.classList.contains('show') ? '▼ Hide Model Answer' : '▶ Reveal Model Answer';
+}
+
+// Build Long Answer
+function buildLong() {
+  const container = document.getElementById('long-section');
+  longAnswers.forEach((la, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.innerHTML = `
+      <div class="q-num">Essay Question ${i+1} of 10</div>
+      <div class="q-text">${la.q}</div>
+      <div class="short-answer long-answer">
+        <textarea placeholder="Write your comprehensive answer here (aim for at least 3–5 paragraphs)..." id="la-${i}"></textarea>
+        <button class="reveal-btn" onclick="revealLA(${i}, this)">▶ Reveal Model Answer</button>
+        <div class="model-answer" id="la-ans-${i}">${la.ans}</div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function revealLA(i, btn) {
+  const ans = document.getElementById(`la-ans-${i}`);
+  ans.classList.toggle('show');
+  btn.textContent = ans.classList.contains('show') ? '▼ Hide Model Answer' : '▶ Reveal Model Answer';
+}
+
+buildMCQ();
+buildShort();
+buildLong();
+</script>
+</body>
+</html>
